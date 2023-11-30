@@ -4,6 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void str_null_terminate(char* str, s64 length)
+{
+    char* loc = &str[length];
+    *loc = 0;
+}
+
 void read_file_to_string(char* filepath, char* buffer, s64 max_bytes)
 {
 	FILE *file;
@@ -19,5 +25,7 @@ void read_file_to_string(char* filepath, char* buffer, s64 max_bytes)
     fseek(file, 0, SEEK_SET);
 
     fread(buffer, 1, file_size, file);
+    str_null_terminate(buffer, file_size);
+
     fclose(file);
 }

@@ -30,19 +30,17 @@ u32 compile_shader(char* vertex_shader_path, char* fragment_shader_path)
 
     bool success;
     byte shader_memory[SHADER_SOURCE_LENGTH] = {0};
-    const GLchar* const* shader_scr = (const GLchar* const*)&shader_memory[0];
+    char* shader_src = &shader_memory[0];
 
-    read_file_to_string(vertex_shader_path, shader_scr, SHADER_SOURCE_LENGTH);
-
+    read_file_to_string(vertex_shader_path, shader_src, SHADER_SOURCE_LENGTH);
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, shader_scr, NULL);
+    glShaderSource(vertex_shader, 1, &shader_src, NULL);
     glCompileShader(vertex_shader);
     check_shader_compile_error(vertex_shader);
 
-    read_file_to_string(fragment_shader_path, shader_scr, SHADER_SOURCE_LENGTH);
-
+    read_file_to_string(fragment_shader_path, shader_src, SHADER_SOURCE_LENGTH);
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, shader_scr, NULL);
+    glShaderSource(fragment_shader, 1, &shader_src, NULL);
     glCompileShader(fragment_shader);
     check_shader_compile_error(fragment_shader);
 
