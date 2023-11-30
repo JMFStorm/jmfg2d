@@ -1,0 +1,6 @@
+debug/
+*.pdb
+*.rdbg
+*.ilk
+*.exe
+*.obj
