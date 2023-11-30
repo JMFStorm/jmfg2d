@@ -1,41 +1,25 @@
 #include "j_graphics.h"
 
+#include <assert.h>
 #include <glad/glad.h>
 
 #include "constants.h"
 #include "files.h"
-#include "j_assert.h"
 
-bool check_shader_compile_error(u32 shader)
+void check_shader_compile_error(u32 shader)
 {
-    s32 success;
+    s32 shader_compile_success;
     char info_log[INFO_LOG_LENGTH] = {0};
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-    if (!success)
-    {
-        glGetShaderInfoLog(shader, INFO_LOG_LENGTH, NULL, info_log);
-        printf("ERROR: SHADER_COMPILATION_ERROR %s", info_log);
-        return false;
-    }
-
-    return true;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_compile_success);
+    assert(shader_compile_success);
 }
 
-bool check_shader_link_error(u32 shader)
+void check_shader_link_error(u32 shader)
 {
-    s32 success;
+    s32 shader_compile_success;
     char info_log[INFO_LOG_LENGTH] = {0};
-    glGetProgramiv(shader, GL_LINK_STATUS, &success);
-
-    if (!success)
-    {
-        glGetProgramInfoLog(shader, INFO_LOG_LENGTH, NULL, info_log);
-        printf("ERROR: PROGRAM_LINKING_ERROR %s", info_log);
-        return false;
-    }
-
-    return true;
+    glGetProgramiv(shader, GL_LINK_STATUS, &shader_compile_success);
+    assert(shader_compile_success);
 }
 
 u32 compile_shader(char* vertex_shader_path, char* fragment_shader_path)
@@ -53,30 +37,23 @@ u32 compile_shader(char* vertex_shader_path, char* fragment_shader_path)
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, shader_scr, NULL);
     glCompileShader(vertex_shader);
-
-    success = check_shader_compile_error(vertex_shader);
-    ASSERT_TRUE(success, "Vertex shader compile");
+    check_shader_compile_error(vertex_shader);
 
     read_file_to_string(fragment_shader_path, shader_scr, SHADER_SOURCE_LENGTH);
 
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, shader_scr, NULL);
     glCompileShader(fragment_shader);
-
-    success = check_shader_compile_error(fragment_shader);
-    ASSERT_TRUE(success, "Fragment shader compile");
+    check_shader_compile_error(fragment_shader);
 
     shader_id = glCreateProgram();
     glAttachShader(shader_id, vertex_shader);
     glAttachShader(shader_id, fragment_shader);
     glLinkProgram(shader_id);
-
-    success = check_shader_link_error(shader_id);
-    ASSERT_TRUE(success, "Shader program link");
+    check_shader_link_error(shader_id);
 
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
-
     return shader_id;
 }
 

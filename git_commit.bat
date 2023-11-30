@@ -1,1 +1,2 @@
-git add . && git commit -m "git commit" && git push origin master
+git add . && git commit -m "git commit"
+rem && git push origin master
