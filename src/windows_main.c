@@ -177,6 +177,9 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
     init_shaders();
 
+    const char* font_path = "G:\\projects\\game\\JMF_Engine\\resources\\fonts\\Inter-Regular.ttf";
+    u32 atlas_texture_id = my_stbtt_initfont(font_path);
+
     set_vertical_flip_image_load(true);
     test_texture_id = load_image_to_texture("G:\\projects\\game\\Engine3D\\resources\\materials\\bricks_reclaimed.png");
 
