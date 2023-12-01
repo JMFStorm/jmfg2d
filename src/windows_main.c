@@ -1,10 +1,13 @@
 #define UNICODE
 #define _UNICODE
 
+#include <stdio.h>
 #include <Windows.h>
 #include <glad/glad.h>
 
+#include "globals.h"
 #include "j_input.h"
+#include "types.h"
 
 typedef struct UserSettings {
     int window_width_px;
@@ -19,16 +22,24 @@ HGLRC opengl_context;
 
 GameInputs game_inputs_init()
 {
-    GameInputs inputs = {
-        { VK_LBUTTON },
-        { VK_RBUTTON },
-        { VK_CONTROL },
-        { VK_SPACE },
-    };
+    GameInputs inputs = {0};
+    inputs.mouse1 = (ButtonState){.key=VK_LBUTTON,  .pressed=false, .is_down=false};
+    inputs.mouse2 = (ButtonState){.key=VK_RBUTTON,  .pressed=false, .is_down=false};
+    inputs.ctrl   = (ButtonState){.key=VK_CONTROL,  .pressed=false, .is_down=false};
+    inputs.space  = (ButtonState){.key=VK_SPACE,    .pressed=false, .is_down=false};
+    inputs.plus   = (ButtonState){.key=VK_ADD,      .pressed=false, .is_down=false};
+    inputs.minus  = (ButtonState){.key=VK_SUBTRACT, .pressed=false, .is_down=false};
     return inputs;
 }
 
 const int BUTTON_INPUTS_COUNT = sizeof(GameInputs) / sizeof(ButtonState);
+
+void get_button_state(ButtonState* button)
+{
+    bool is_pressed = GetAsyncKeyState(button->key) & 0x8000;
+    button->pressed = !button->is_down && is_pressed;
+    button->is_down = is_pressed;
+}
 
 LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param)
 {
@@ -114,7 +125,6 @@ HGLRC create_opengl_context()
     HGLRC context = wglCreateContext(dc);
     wglMakeCurrent(dc, context);
     ReleaseDC(window_handle, dc);
-
     return context;
 }
 
@@ -140,8 +150,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     MSG msg;
     HDC device_context = GetDC(window_handle);
 
+    float green = 0.0f;
     glViewport(0, 0, user_settings.window_width_px, user_settings.window_height_px);
-    glClearColor(0.3f, 0.4f, 0.5f, 1.0f);
 
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
     {
@@ -152,11 +162,19 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
         for (int i = 0; i < BUTTON_INPUTS_COUNT - 1; i++)
         {
-            ButtonState* current_button = &buttons_ptr[i];
-            set_button_state(current_button);
+            ButtonState* button_ptr = &buttons_ptr[i];
+            get_button_state(button_ptr);
         }
 
+        glClearColor(1.0f, green, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(simple_rect_shader.id);
+        glBindVertexArray(simple_rect_shader.vao);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glUseProgram(0);
+        glBindVertexArray(0);
+
         SwapBuffers(device_context);
     }
 
@@ -165,6 +183,5 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
     ReleaseDC(window_handle, device_context);
     UnregisterClass(window_class.lpszClassName, window_class.hInstance);
-
     return 0;
 }

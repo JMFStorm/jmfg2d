@@ -1,9 +1,11 @@
 #pragma once
 
+#include <stdbool.h>
+
 typedef struct ButtonState {
     int key;
-    int pressed;
-    int is_down;
+    bool pressed;
+    bool is_down;
 } ButtonState;
 
 typedef struct GameInputs {
@@ -11,6 +13,6 @@ typedef struct GameInputs {
     ButtonState mouse2;
     ButtonState ctrl;
     ButtonState space;
+    ButtonState plus;
+    ButtonState minus;
 } GameInputs;
-
-void set_button_state(ButtonState* button);

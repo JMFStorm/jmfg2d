@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 
 #include "constants.h"
+#include "globals.h"
 #include "files.h"
 
 void check_shader_compile_error(u32 shader)
@@ -29,7 +30,7 @@ u32 compile_shader(char* vertex_shader_path, char* fragment_shader_path)
     u32 fragment_shader;
 
     bool success;
-    byte shader_memory[SHADER_SOURCE_LENGTH] = {0};
+    char shader_memory[SHADER_SOURCE_LENGTH] = {0};
     char* shader_src = &shader_memory[0];
 
     read_file_to_string(vertex_shader_path, shader_src, SHADER_SOURCE_LENGTH);
@@ -60,7 +61,6 @@ void init_rectangle_shader()
     const char* vertex_shader_path   = "G:/projects/game/JMF_Engine/resources/shaders/rectangle_vs.glsl";
     const char* fragment_shader_path = "G:/projects/game/JMF_Engine/resources/shaders/rectangle_fs.glsl";
 
-    Shader simple_rect_shader = {0};
     simple_rect_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
 
     glGenVertexArrays(1, &simple_rect_shader.vao);
