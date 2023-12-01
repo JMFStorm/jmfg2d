@@ -23,5 +23,7 @@ void init_shaders();
 
 void set_draw_area(s32 start_x, s32 start_y, s32 end_x, s32 end_y);
 
+u32 load_atlas_into_texture(byte* atlas_bitmap, s32 width, s32 height);
+
 void append_rect(vec2 offset);
 void draw_rects(u32 test_texture_id);

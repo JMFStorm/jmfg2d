@@ -34,13 +34,13 @@ u32 compile_shader(char* vertex_shader_path, char* fragment_shader_path)
     char shader_memory[SHADER_SOURCE_LENGTH] = {0};
     char* shader_src = &shader_memory[0];
 
-    read_file_to_string(vertex_shader_path, shader_src, SHADER_SOURCE_LENGTH);
+    read_file_to_ptr(vertex_shader_path, shader_src, SHADER_SOURCE_LENGTH);
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &shader_src, NULL);
     glCompileShader(vertex_shader);
     check_shader_compile_error(vertex_shader);
 
-    read_file_to_string(fragment_shader_path, shader_src, SHADER_SOURCE_LENGTH);
+    read_file_to_ptr(fragment_shader_path, shader_src, SHADER_SOURCE_LENGTH);
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &shader_src, NULL);
     glCompileShader(fragment_shader);
@@ -156,6 +156,16 @@ u32 load_image_to_texture(char* image_path)
     if (generate_texture_mipmaps) glGenerateMipmap(GL_TEXTURE_2D);
 
     free_loaded_image(image);
+    return texture_id;
+}
+
+u32 load_atlas_into_texture(byte* atlas_bitmap, s32 width, s32 height)
+{
+    u32 texture_id;
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, atlas_bitmap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     return texture_id;
 }
 

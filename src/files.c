@@ -10,7 +10,7 @@ void str_null_terminate(char* str, s64 length)
     *loc = 0;
 }
 
-void read_file_to_string(char* filepath, char* buffer, s64 max_bytes)
+void read_file_to_ptr(char* filepath, char* buffer, s64 max_bytes)
 {
 	FILE *file;
     s64 file_size;
