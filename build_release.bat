@@ -7,6 +7,6 @@ if not defined VC_ENV_SET (
 
 setlocal
 
-cl src\*.c /Zi /DEBUG /MTd /I"include" /Fodebug\ /Fedebug\JMF_Engine.exe user32.lib opengl32.lib gdi32.lib
+cl src\*.c /O2 /MT /I"include" /Forelease\ /Ferelease\JMF_Engine.exe user32.lib opengl32.lib gdi32.lib
 
 endlocal

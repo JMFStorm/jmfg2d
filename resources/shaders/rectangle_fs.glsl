@@ -1,8 +1,13 @@
 #version 330 core
 
-out vec4 fragOutput;
+in vec2 uv;
+
+uniform sampler2D texture1;
+
+out vec4 frag_out;
 
 void main()
 {
-    fragOutput = vec4(1.0, 0.5, 0.5, 1.0);
+    frag_out = texture(texture1, uv);
+    // frag_out = vec4(1.0, 0.5, 0.5, 1.0);
 }

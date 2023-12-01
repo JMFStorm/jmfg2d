@@ -10,7 +10,6 @@ typedef struct Size {
 typedef struct vec2 {
 	f32 x;
 	f32 y;
-	f32 z;
 } vec2;
 
 typedef struct vec3 {

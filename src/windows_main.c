@@ -1,11 +1,14 @@
 #define UNICODE
 #define _UNICODE
 
+#define STB_TRUETYPE_IMPLEMENTATION
+
 #include <stdio.h>
 #include <Windows.h>
 #include <glad/glad.h>
 
 #include "globals.h"
+#include "jimage.h"
 #include "jinput.h"
 #include "jmath.h"
 #include "types.h"
@@ -31,9 +34,9 @@ Size get_window_size()
     return size;
 }
 
-void set_window_size(Size size)
+void set_window_size(s32 width_px, s32 height_px)
 {
-    SetWindowPos(window_handle, NULL, 0, 0, size.width, size.height, SWP_NOMOVE | SWP_NOZORDER);
+    SetWindowPos(window_handle, NULL, 0, 0, width_px, height_px, SWP_NOMOVE | SWP_NOZORDER);
 }
 
 GameInputs game_inputs_init()
@@ -156,6 +159,8 @@ HGLRC create_opengl_context()
     return context;
 }
 
+u32 test_texture_id;
+
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show)
 {
     UserSettings user_settings = {0};
@@ -172,13 +177,15 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
     init_shaders();
 
+    set_vertical_flip_image_load(true);
+    test_texture_id = load_image_to_texture("G:\\projects\\game\\Engine3D\\resources\\materials\\bricks_reclaimed.png");
+
     ShowWindow(window_handle, cmd_show);
     UpdateWindow(window_handle);
+    set_window_size(user_settings.window_width_px, user_settings.window_height_px);
 
     MSG msg;
     HDC device_context = GetDC(window_handle);
-
-    set_draw_area(0, 0, user_settings.window_width_px, user_settings.window_height_px);
 
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
     {
@@ -197,35 +204,35 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         {
             Size window_size = get_window_size();
             window_size.width += 100;
-            set_window_size(window_size);
+            set_window_size(window_size.width, window_size.height);
         }
         else if (g_inputs.left.pressed)
         {
             Size window_size = get_window_size();
             window_size.width -= 100;
-            set_window_size(window_size);
+            set_window_size(window_size.width, window_size.height);
         }
         else if (g_inputs.down.pressed)
         {
             Size window_size = get_window_size();
             window_size.height += 100;
-            set_window_size(window_size);
+            set_window_size(window_size.width, window_size.height);
         }
         else if (g_inputs.up.pressed)
         {
             Size window_size = get_window_size();
             window_size.height -= 100;
-            set_window_size(window_size);
+            set_window_size(window_size.width, window_size.height);
         }
 
         glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(simple_rect_shader.id);
-        glBindVertexArray(simple_rect_shader.vao);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glUseProgram(0);
-        glBindVertexArray(0);
+        vec2 rect_offset = { .x = 0.5f, .y = 0.5f };
+        append_rect(rect_offset);
+        vec2 rect_offset2 = { .x = -0.5f, .y = -0.5f };
+        append_rect(rect_offset2);
+        draw_rects(test_texture_id);
 
         SwapBuffers(device_context);
     }

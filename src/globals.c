@@ -1,3 +1,4 @@
 #include "globals.h"
 
-Shader simple_rect_shader = {0};
+RectangleShader rect_shader = {0};
+s64 rects_buffered = 0;

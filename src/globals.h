@@ -1,3 +1,4 @@
 #include "jgraphics.h"
 
-extern Shader simple_rect_shader;
+extern RectangleShader rect_shader;
+extern s64 rects_buffered;
