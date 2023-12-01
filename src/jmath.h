@@ -2,6 +2,11 @@
 
 #include "types.h"
 
+typedef struct Size {
+	s32 width;
+	s32 height;
+} Size;
+
 typedef struct vec2 {
 	f32 x;
 	f32 y;

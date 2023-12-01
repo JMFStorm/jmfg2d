@@ -13,6 +13,8 @@ typedef struct GameInputs {
     ButtonState mouse2;
     ButtonState ctrl;
     ButtonState space;
-    ButtonState plus;
-    ButtonState minus;
+    ButtonState left;
+    ButtonState right;
+    ButtonState up;
+    ButtonState down;
 } GameInputs;

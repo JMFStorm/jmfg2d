@@ -1,4 +1,4 @@
-#include "j_graphics.h"
+#include "jgraphics.h"
 
 #include <assert.h>
 #include <glad/glad.h>
@@ -94,4 +94,9 @@ void init_rectangle_shader()
 void init_shaders()
 {
 	init_rectangle_shader();
+}
+
+void set_draw_area(s32 start_x, s32 start_y, s32 end_x, s32 end_y)
+{
+    glViewport(start_x, start_y, end_x, end_y);
 }

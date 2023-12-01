@@ -6,7 +6,8 @@
 #include <glad/glad.h>
 
 #include "globals.h"
-#include "j_input.h"
+#include "jinput.h"
+#include "jmath.h"
 #include "types.h"
 
 typedef struct UserSettings {
@@ -20,15 +21,32 @@ WNDCLASSEX window_class;
 HWND window_handle;
 HGLRC opengl_context;
 
+Size get_window_size()
+{
+    RECT rect;
+    Size size = {0};
+    GetWindowRect(window_handle, &rect);
+    size.width = rect.right - rect.left;
+    size.height = rect.bottom - rect.top;
+    return size;
+}
+
+void set_window_size(Size size)
+{
+    SetWindowPos(window_handle, NULL, 0, 0, size.width, size.height, SWP_NOMOVE | SWP_NOZORDER);
+}
+
 GameInputs game_inputs_init()
 {
     GameInputs inputs = {0};
-    inputs.mouse1 = (ButtonState){.key=VK_LBUTTON,  .pressed=false, .is_down=false};
-    inputs.mouse2 = (ButtonState){.key=VK_RBUTTON,  .pressed=false, .is_down=false};
-    inputs.ctrl   = (ButtonState){.key=VK_CONTROL,  .pressed=false, .is_down=false};
-    inputs.space  = (ButtonState){.key=VK_SPACE,    .pressed=false, .is_down=false};
-    inputs.plus   = (ButtonState){.key=VK_ADD,      .pressed=false, .is_down=false};
-    inputs.minus  = (ButtonState){.key=VK_SUBTRACT, .pressed=false, .is_down=false};
+    inputs.mouse1 = (ButtonState){.key=VK_LBUTTON, .pressed=false, .is_down=false};
+    inputs.mouse2 = (ButtonState){.key=VK_RBUTTON, .pressed=false, .is_down=false};
+    inputs.ctrl   = (ButtonState){.key=VK_CONTROL, .pressed=false, .is_down=false};
+    inputs.space  = (ButtonState){.key=VK_SPACE,   .pressed=false, .is_down=false};
+    inputs.left   = (ButtonState){.key=VK_LEFT,    .pressed=false, .is_down=false};
+    inputs.right  = (ButtonState){.key=VK_RIGHT,   .pressed=false, .is_down=false};
+    inputs.up     = (ButtonState){.key=VK_UP,      .pressed=false, .is_down=false};
+    inputs.down   = (ButtonState){.key=VK_DOWN,    .pressed=false, .is_down=false};
     return inputs;
 }
 
@@ -47,6 +65,12 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param
     {
         case WM_DESTROY:
             PostQuitMessage(0);
+            return 0;
+
+        case WM_SIZE:
+            s32 new_width = LOWORD(l_param);
+            s32 new_height = HIWORD(l_param);
+            set_draw_area(0, 0, new_width, new_height);
             return 0;
 
         case WM_PAINT:
@@ -82,7 +106,11 @@ HWND create_window(WNDCLASSEX wc, int width, int height)
     HWND handle = CreateWindow(
         wc.lpszClassName,       // lpClassName: Pointer to a null-terminated string or a class atom.
         L"JMF Engine",          // lpWindowName: Pointer to a null-terminated string that specifies the window name.
-        WS_OVERLAPPEDWINDOW,    // dwStyle: Window style.
+        WS_OVERLAPPED 
+        | WS_SYSMENU 
+        | WS_CAPTION
+        | WS_MINIMIZEBOX
+        | WS_MAXIMIZEBOX,       // dwStyle: Window style.
         100, 100,               // x, y: Initial position of the window.
         width,                  // nWidth:
         height,                 // nHeight: Width and height of the window.
@@ -150,8 +178,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     MSG msg;
     HDC device_context = GetDC(window_handle);
 
-    float green = 0.0f;
-    glViewport(0, 0, user_settings.window_width_px, user_settings.window_height_px);
+    set_draw_area(0, 0, user_settings.window_width_px, user_settings.window_height_px);
 
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
     {
@@ -160,13 +187,38 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
         ButtonState* buttons_ptr = (ButtonState*)&g_inputs;
 
-        for (int i = 0; i < BUTTON_INPUTS_COUNT - 1; i++)
+        for (int i = 0; i < BUTTON_INPUTS_COUNT; i++)
         {
             ButtonState* button_ptr = &buttons_ptr[i];
             get_button_state(button_ptr);
         }
 
-        glClearColor(1.0f, green, 1.0f, 1.0f);
+        if (g_inputs.right.pressed)
+        {
+            Size window_size = get_window_size();
+            window_size.width += 100;
+            set_window_size(window_size);
+        }
+        else if (g_inputs.left.pressed)
+        {
+            Size window_size = get_window_size();
+            window_size.width -= 100;
+            set_window_size(window_size);
+        }
+        else if (g_inputs.down.pressed)
+        {
+            Size window_size = get_window_size();
+            window_size.height += 100;
+            set_window_size(window_size);
+        }
+        else if (g_inputs.up.pressed)
+        {
+            Size window_size = get_window_size();
+            window_size.height -= 100;
+            set_window_size(window_size);
+        }
+
+        glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(simple_rect_shader.id);
