@@ -23,6 +23,7 @@ UserSettings user_settings;
 WNDCLASSEX window_class;
 HWND window_handle;
 HGLRC opengl_context;
+GameInputs inputs;
 
 Size get_window_size()
 {
@@ -41,16 +42,16 @@ void set_window_size(s32 width_px, s32 height_px)
 
 GameInputs game_inputs_init()
 {
-    GameInputs inputs = {0};
-    inputs.mouse1 = (ButtonState){.key=VK_LBUTTON, .pressed=false, .is_down=false};
-    inputs.mouse2 = (ButtonState){.key=VK_RBUTTON, .pressed=false, .is_down=false};
-    inputs.ctrl   = (ButtonState){.key=VK_CONTROL, .pressed=false, .is_down=false};
-    inputs.space  = (ButtonState){.key=VK_SPACE,   .pressed=false, .is_down=false};
-    inputs.left   = (ButtonState){.key=VK_LEFT,    .pressed=false, .is_down=false};
-    inputs.right  = (ButtonState){.key=VK_RIGHT,   .pressed=false, .is_down=false};
-    inputs.up     = (ButtonState){.key=VK_UP,      .pressed=false, .is_down=false};
-    inputs.down   = (ButtonState){.key=VK_DOWN,    .pressed=false, .is_down=false};
-    return inputs;
+    GameInputs gi = {0};
+    gi.mouse1 = (ButtonState){.key=VK_LBUTTON, .pressed=false, .is_down=false};
+    gi.mouse2 = (ButtonState){.key=VK_RBUTTON, .pressed=false, .is_down=false};
+    gi.ctrl   = (ButtonState){.key=VK_CONTROL, .pressed=false, .is_down=false};
+    gi.space  = (ButtonState){.key=VK_SPACE,   .pressed=false, .is_down=false};
+    gi.left   = (ButtonState){.key=VK_LEFT,    .pressed=false, .is_down=false};
+    gi.right  = (ButtonState){.key=VK_RIGHT,   .pressed=false, .is_down=false};
+    gi.up     = (ButtonState){.key=VK_UP,      .pressed=false, .is_down=false};
+    gi.down   = (ButtonState){.key=VK_DOWN,    .pressed=false, .is_down=false};
+    return gi;
 }
 
 const int BUTTON_INPUTS_COUNT = sizeof(GameInputs) / sizeof(ButtonState);
@@ -60,6 +61,17 @@ void get_button_state(ButtonState* button)
     bool is_pressed = GetAsyncKeyState(button->key) & 0x8000;
     button->pressed = !button->is_down && is_pressed;
     button->is_down = is_pressed;
+}
+
+void set_buttons_states()
+{
+    ButtonState* buttons_ptr = (ButtonState*)&inputs;
+
+    for (int i = 0; i < BUTTON_INPUTS_COUNT; i++)
+    {
+        ButtonState* button_ptr = &buttons_ptr[i];
+        get_button_state(button_ptr);
+    }
 }
 
 LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param)
@@ -173,7 +185,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     opengl_context = create_opengl_context();
     gladLoadGL();
 
-    GameInputs g_inputs = game_inputs_init();
+    inputs = game_inputs_init();
 
     init_shaders();
 
@@ -195,33 +207,27 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         TranslateMessage(&msg);
         DispatchMessage(&msg);
 
-        ButtonState* buttons_ptr = (ButtonState*)&g_inputs;
+        set_buttons_states();
 
-        for (int i = 0; i < BUTTON_INPUTS_COUNT; i++)
-        {
-            ButtonState* button_ptr = &buttons_ptr[i];
-            get_button_state(button_ptr);
-        }
-
-        if (g_inputs.right.pressed)
+        if (inputs.right.pressed)
         {
             Size window_size = get_window_size();
             window_size.width += 100;
             set_window_size(window_size.width, window_size.height);
         }
-        else if (g_inputs.left.pressed)
+        else if (inputs.left.pressed)
         {
             Size window_size = get_window_size();
             window_size.width -= 100;
             set_window_size(window_size.width, window_size.height);
         }
-        else if (g_inputs.down.pressed)
+        else if (inputs.down.pressed)
         {
             Size window_size = get_window_size();
             window_size.height += 100;
             set_window_size(window_size.width, window_size.height);
         }
-        else if (g_inputs.up.pressed)
+        else if (inputs.up.pressed)
         {
             Size window_size = get_window_size();
             window_size.height -= 100;
