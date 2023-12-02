@@ -3,10 +3,10 @@
 #include <assert.h>
 #include <glad/glad.h>
 
-#include "jimage.h"
 #include "constants.h"
-#include "globals.h"
 #include "files.h"
+#include "globals.h"
+#include "jimage.h"
 
 void check_shader_compile_error(u32 shader)
 {
@@ -109,9 +109,38 @@ void init_rectangle_shader()
     glBindVertexArray(0);
 }
 
+void init_text_shader()
+{
+    const char* vertex_shader_path   = "G:/projects/game/JMF_Engine/resources/shaders/ui_text_vs.glsl";
+    const char* fragment_shader_path = "G:/projects/game/JMF_Engine/resources/shaders/ui_text_fs.glsl";
+
+    ui_text_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
+
+    glGenVertexArrays(1, &ui_text_shader.vao);
+    glGenBuffers(1, &ui_text_shader.vbo);
+
+    glBindVertexArray(ui_text_shader.vao);
+    glBindBuffer(GL_ARRAY_BUFFER, ui_text_shader.vbo);
+
+    s64 vbo_size = (sizeof(float) * 5 * 6) * MAX_BUFFERED_TEXT;
+    glBufferData(GL_ARRAY_BUFFER, vbo_size, NULL, GL_DYNAMIC_DRAW);
+
+    // Coord attribute 0
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // UV attribute 1
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(sizeof(float) * 3));
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
 void init_shaders()
 {
 	init_rectangle_shader();
+    init_text_shader();
 }
 
 void set_draw_area(s32 start_x, s32 start_y, s32 end_x, s32 end_y)
@@ -187,6 +216,56 @@ void draw_rects(u32 texture_id)
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, rects_buffered);
 
     rects_buffered = 0;
+    glUseProgram(0);
+    glBindVertexArray(0);
+}
+
+void append_char(char character)
+{
+    float top_left[4] = {0};
+    float bot_right[4] = {0};
+    get_char_from_atlas(character, top_left, bot_right);
+
+    float vertices[] =
+    {
+        // Coords              // UV
+        -0.25f, -0.25f, 0.0f,  top_left[2],  bot_right[3], // bottom left
+         0.25f, -0.25f, 0.0f,  bot_right[2], bot_right[3], // bottom right
+        -0.25f,  0.25f, 0.0f,  top_left[2],  top_left[3],  // top left
+ 
+        -0.25f,  0.25f, 0.0f,  top_left[2],  top_left[3],  // top left
+         0.25f, -0.25f, 0.0f,  bot_right[2], bot_right[3], // bottom right
+         0.25f,  0.25f, 0.0f,  bot_right[2], top_left[3]   // top right
+    };
+/*
+    float vertices[] =
+    {
+        // Coords              // UV
+        -0.25f, -0.25f, 0.0f,  0.0f, 0.0f, // bottom left
+         0.25f, -0.25f, 0.0f,  1.0f, 0.0f, // bottom right
+        -0.25f,  0.25f, 0.0f,  0.0f, 1.0f, // top left
+ 
+        -0.25f,  0.25f, 0.0f,  0.0f, 1.0f, // top left
+         0.25f, -0.25f, 0.0f,  1.0f, 0.0f, // bottom right
+         0.25f,  0.25f, 0.0f,  1.0f, 1.0f  // top right
+    };
+*/
+    s64 bytes_offset = chars_buffered * sizeof(vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, ui_text_shader.vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, bytes_offset, sizeof(vertices), vertices);
+    chars_buffered++;
+}
+
+void draw_chars(u32 atlas_texture_id)
+{
+    glEnable(GL_TEXTURE_2D);
+
+    glBindTexture(GL_TEXTURE_2D, atlas_texture_id);
+    glUseProgram(ui_text_shader.id);
+    glBindVertexArray(ui_text_shader.vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    chars_buffered = 0;
     glUseProgram(0);
     glBindVertexArray(0);
 }

@@ -190,7 +190,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     init_shaders();
 
     const char* font_path = "G:\\projects\\game\\JMF_Engine\\resources\\fonts\\Inter-Regular.ttf";
-    u32 atlas_texture_id = my_stbtt_initfont(font_path);
+    u32 atlas_texture_id = init_font_atlas(font_path, 128);
 
     set_vertical_flip_image_load(true);
     test_texture_id = load_image_to_texture("G:\\projects\\game\\Engine3D\\resources\\materials\\bricks_reclaimed.png");
@@ -236,12 +236,19 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
         glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        vec2 rect_offset = { .x = 0.5f, .y = 0.5f };
+        vec2 rect_offset = { .x = -0.5f, .y = -0.5f };
         append_rect(rect_offset);
-        vec2 rect_offset2 = { .x = -0.5f, .y = -0.5f };
+        draw_rects(atlas_texture_id);
+
+        vec2 rect_offset2 = { .x = 0.0f, .y = -0.5f };
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
+
+        append_char('a');
+        draw_chars(atlas_texture_id);
 
         SwapBuffers(device_context);
     }
