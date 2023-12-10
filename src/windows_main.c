@@ -252,7 +252,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
 
-        append_char('b', &debug_font_data);
+        vec2 text_loc = {0};
+        append_text("Uy text", &debug_font_data, text_loc);
         draw_chars(atlas_texture_id);
 
         Point win_size = get_window_size();

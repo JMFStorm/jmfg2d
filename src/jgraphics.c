@@ -220,22 +220,42 @@ void draw_rects(u32 texture_id)
     glBindVertexArray(0);
 }
 
+vec2 append_text(char* text, CharData* char_data, vec2 screen_pos)
+{
+    s64 length = strlen(text);
+
+    for (int i = 0; i < length; i++)
+    {
+        char current = text[i];
+
+        s64 c_index = current - 32;
+        s64 c_width = char_data->cdata[c_index].x1 - char_data->cdata[c_index].x0;
+        s64 c_height = char_data->cdata[c_index].y1 - char_data->cdata[c_index].y0;
+        s64 c_advance = char_data->cdata[c_index].xadvance;
+
+        append_char(current, char_data);
+    }
+
+    vec2 next_cursor_pos = {0};
+    return next_cursor_pos;
+}
+
 void append_char(char character, CharData* char_data)
 {
-    float top_left[4] = {0};
-    float bot_right[4] = {0};
-    get_char_from_atlas(character, top_left, bot_right, char_data);
+    float uv_top_left[4] = {0};
+    float uv_bot_right[4] = {0};
+    get_char_from_atlas(character, uv_top_left, uv_bot_right, char_data);
 
     float vertices[] =
     {
         // Coords              // UV
-        -0.25f, -0.25f, 0.0f,  top_left[2],  bot_right[3], // bottom left
-         0.25f, -0.25f, 0.0f,  bot_right[2], bot_right[3], // bottom right
-        -0.25f,  0.25f, 0.0f,  top_left[2],  top_left[3],  // top left
+        -0.25f, -0.25f, 0.0f,  uv_top_left[2],  uv_bot_right[3], // bottom left
+         0.25f, -0.25f, 0.0f,  uv_bot_right[2], uv_bot_right[3], // bottom right
+        -0.25f,  0.25f, 0.0f,  uv_top_left[2],  uv_top_left[3],  // top left
  
-        -0.25f,  0.25f, 0.0f,  top_left[2],  top_left[3],  // top left
-         0.25f, -0.25f, 0.0f,  bot_right[2], bot_right[3], // bottom right
-         0.25f,  0.25f, 0.0f,  bot_right[2], top_left[3]   // top right
+        -0.25f,  0.25f, 0.0f,  uv_top_left[2],  uv_top_left[3],  // top left
+         0.25f, -0.25f, 0.0f,  uv_bot_right[2], uv_bot_right[3], // bottom right
+         0.25f,  0.25f, 0.0f,  uv_bot_right[2], uv_top_left[3]   // top right
     };
 
     s64 bytes_offset = chars_buffered * sizeof(vertices);
