@@ -3,9 +3,10 @@
 
 #define STB_TRUETYPE_IMPLEMENTATION
 
-#include <stdio.h>
 #include <Windows.h>
 #include <glad/glad.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "globals.h"
 #include "jimage.h"
@@ -13,17 +14,20 @@
 #include "jmath.h"
 #include "types.h"
 
-typedef struct UserSettings {
-    int window_width_px;
-    int window_height_px;
-} UserSettings;
-
-UserSettings user_settings;
-
 WNDCLASSEX window_class;
 HWND window_handle;
 HGLRC opengl_context;
 GameInputs inputs;
+
+void debug_log(const char* str_format, ...)
+{
+    char d_msg[256];
+    va_list args;
+    va_start(args, str_format);
+    vsnprintf(d_msg, sizeof(d_msg), str_format, args);
+    OutputDebugStringA(d_msg);
+    va_end(args);
+}
 
 Point get_window_size()
 {
@@ -175,7 +179,6 @@ u32 test_texture_id;
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show)
 {
-    UserSettings user_settings = {0};
     user_settings.window_width_px = 1600;
     user_settings.window_height_px = 1200;
 
@@ -190,7 +193,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     init_shaders();
 
     const char* font_path = "G:\\projects\\game\\JMF_Engine\\resources\\fonts\\Inter-Regular.ttf";
-    u32 atlas_texture_id = init_font_atlas(font_path, 128, &debug_font_data);
+    u32 atlas_texture_id = init_font_atlas((char*)font_path, 128, &debug_font_data);
 
     set_vertical_flip_image_load(true);
     test_texture_id = load_image_to_texture("G:\\projects\\game\\Engine3D\\resources\\materials\\bricks_reclaimed.png");
@@ -249,6 +252,9 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
         append_char('b', &debug_font_data);
         draw_chars(atlas_texture_id);
+
+        Point win_size = get_window_size();
+        debug_log("Window: %d,%d\n", win_size.x, win_size.y);
 
         SwapBuffers(device_context);
     }

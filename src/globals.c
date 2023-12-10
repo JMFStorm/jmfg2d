@@ -7,3 +7,5 @@ s64 rects_buffered = 0;
 s64 chars_buffered = 0;
 
 CharData debug_font_data = {0};
+
+UserSettings user_settings = {0};
