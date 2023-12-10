@@ -180,7 +180,7 @@ u32 load_image_to_texture(char* image_path)
     if (load_texture_sRGB) internal_format = image.channels == 3 ? GL_SRGB : GL_SRGB_ALPHA;
     else internal_format = image.channels == 3 ? GL_RGB : GL_RGBA;
 
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, image.size_px.width, image.size_px.height, 0, use_format, GL_UNSIGNED_BYTE, image.image_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, image.size_px.x, image.size_px.y, 0, use_format, GL_UNSIGNED_BYTE, image.image_data);
 
     if (generate_texture_mipmaps) glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -220,11 +220,11 @@ void draw_rects(u32 texture_id)
     glBindVertexArray(0);
 }
 
-void append_char(char character)
+void append_char(char character, CharData* char_data)
 {
     float top_left[4] = {0};
     float bot_right[4] = {0};
-    get_char_from_atlas(character, top_left, bot_right);
+    get_char_from_atlas(character, top_left, bot_right, char_data);
 
     float vertices[] =
     {
@@ -237,19 +237,7 @@ void append_char(char character)
          0.25f, -0.25f, 0.0f,  bot_right[2], bot_right[3], // bottom right
          0.25f,  0.25f, 0.0f,  bot_right[2], top_left[3]   // top right
     };
-/*
-    float vertices[] =
-    {
-        // Coords              // UV
-        -0.25f, -0.25f, 0.0f,  0.0f, 0.0f, // bottom left
-         0.25f, -0.25f, 0.0f,  1.0f, 0.0f, // bottom right
-        -0.25f,  0.25f, 0.0f,  0.0f, 1.0f, // top left
- 
-        -0.25f,  0.25f, 0.0f,  0.0f, 1.0f, // top left
-         0.25f, -0.25f, 0.0f,  1.0f, 0.0f, // bottom right
-         0.25f,  0.25f, 0.0f,  1.0f, 1.0f  // top right
-    };
-*/
+
     s64 bytes_offset = chars_buffered * sizeof(vertices);
     glBindBuffer(GL_ARRAY_BUFFER, ui_text_shader.vbo);
     glBufferSubData(GL_ARRAY_BUFFER, bytes_offset, sizeof(vertices), vertices);

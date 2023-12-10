@@ -25,13 +25,13 @@ HWND window_handle;
 HGLRC opengl_context;
 GameInputs inputs;
 
-Size get_window_size()
+Point get_window_size()
 {
     RECT rect;
-    Size size = {0};
+    Point size = {0};
     GetWindowRect(window_handle, &rect);
-    size.width = rect.right - rect.left;
-    size.height = rect.bottom - rect.top;
+    size.x = rect.right - rect.left;
+    size.y = rect.bottom - rect.top;
     return size;
 }
 
@@ -190,7 +190,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     init_shaders();
 
     const char* font_path = "G:\\projects\\game\\JMF_Engine\\resources\\fonts\\Inter-Regular.ttf";
-    u32 atlas_texture_id = init_font_atlas(font_path, 128);
+    u32 atlas_texture_id = init_font_atlas(font_path, 128, &debug_font_data);
 
     set_vertical_flip_image_load(true);
     test_texture_id = load_image_to_texture("G:\\projects\\game\\Engine3D\\resources\\materials\\bricks_reclaimed.png");
@@ -211,27 +211,27 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
         if (inputs.right.pressed)
         {
-            Size window_size = get_window_size();
-            window_size.width += 100;
-            set_window_size(window_size.width, window_size.height);
+            Point window_size = get_window_size();
+            window_size.x += 100;
+            set_window_size(window_size.x, window_size.y);
         }
         else if (inputs.left.pressed)
         {
-            Size window_size = get_window_size();
-            window_size.width -= 100;
-            set_window_size(window_size.width, window_size.height);
+            Point window_size = get_window_size();
+            window_size.x -= 100;
+            set_window_size(window_size.x, window_size.y);
         }
         else if (inputs.down.pressed)
         {
-            Size window_size = get_window_size();
-            window_size.height += 100;
-            set_window_size(window_size.width, window_size.height);
+            Point window_size = get_window_size();
+            window_size.y += 100;
+            set_window_size(window_size.x, window_size.y);
         }
         else if (inputs.up.pressed)
         {
-            Size window_size = get_window_size();
-            window_size.height -= 100;
-            set_window_size(window_size.width, window_size.height);
+            Point window_size = get_window_size();
+            window_size.y -= 100;
+            set_window_size(window_size.x, window_size.y);
         }
 
         glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
@@ -247,7 +247,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
 
-        append_char('a');
+        append_char('b', &debug_font_data);
         draw_chars(atlas_texture_id);
 
         SwapBuffers(device_context);

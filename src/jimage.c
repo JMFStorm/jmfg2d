@@ -13,7 +13,7 @@ void set_vertical_flip_image_load(bool flip)
 ImageData load_image_data(char* image_path)
 {
     ImageData data = {0};
-    data.image_data = stbi_load(image_path, &data.size_px.width, &data.size_px.height, &data.channels, 0);
+    data.image_data = stbi_load(image_path, &data.size_px.x, &data.size_px.y, &data.channels, 0);
     assert(data.image_data != NULL);
     return data;
 }

@@ -2,10 +2,10 @@
 
 #include "types.h"
 
-typedef struct Size {
-	s32 width;
-	s32 height;
-} Size;
+typedef struct Point {
+	s32 x;
+	s32 y;
+} Point;
 
 typedef struct vec2 {
 	f32 x;

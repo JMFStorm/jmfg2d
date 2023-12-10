@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "jmath.h"
+#include "jfont.h"
 
 typedef struct BaseShader {
     u32 id;
@@ -27,3 +28,6 @@ u32 load_atlas_into_texture(byte* atlas_bitmap, s32 width, s32 height);
 
 void append_rect(vec2 offset);
 void draw_rects(u32 test_texture_id);
+
+void append_char(char character, CharData* char_data);
+void draw_chars(u32 atlas_texture_id);

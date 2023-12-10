@@ -4,7 +4,7 @@
 #include "jmath.h"
 
 typedef struct ImageData {
-	Size size_px;
+	Point size_px;
 	s32 channels;
 	byte* image_data;
 } ImageData;
