@@ -21,12 +21,14 @@ GameInputs inputs;
 
 void debug_log(const char* str_format, ...)
 {
+#ifdef DEBUG_BUILD
     char d_msg[256];
     va_list args;
     va_start(args, str_format);
     vsnprintf(d_msg, sizeof(d_msg), str_format, args);
     OutputDebugStringA(d_msg);
     va_end(args);
+#endif
 }
 
 Point get_window_size()
@@ -192,7 +194,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
     init_shaders();
 
-    const char* font_path = "G:\\projects\\game\\JMF_Engine\\resources\\fonts\\Inter-Regular.ttf";
+    const char* font_path = "G:\\projects\\game\\JMF_Engine2D\\resources\\fonts\\Inter-Regular.ttf";
     u32 atlas_texture_id = init_font_atlas((char*)font_path, 128, &debug_font_data);
 
     set_vertical_flip_image_load(true);
