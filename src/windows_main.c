@@ -1,8 +1,6 @@
 #define UNICODE
 #define _UNICODE
 
-#define STB_TRUETYPE_IMPLEMENTATION
-
 #include <Windows.h>
 #include <glad/glad.h>
 #include <stdio.h>
@@ -192,10 +190,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
     inputs = game_inputs_init();
 
-    init_shaders();
+    FontData debug_font;
+    load_font(&debug_font, 64, "G:\\projects\\game\\JMF_Engine2D\\resources\\fonts\\Inter-Regular.ttf");
 
-    const char* font_path = "G:\\projects\\game\\JMF_Engine2D\\resources\\fonts\\Inter-Regular.ttf";
-    u32 atlas_texture_id = init_font_atlas((char*)font_path, 64, &debug_font_data);
+    init_shaders();
 
     set_vertical_flip_image_load(true);
     test_texture_id = load_image_to_texture("G:\\projects\\game\\Engine3D\\resources\\materials\\bricks_reclaimed.png");
@@ -244,19 +242,9 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        vec2 rect_offset = { .x = -0.5f, .y = -0.5f };
-        append_rect(rect_offset);
-        draw_rects(atlas_texture_id);
-
         vec2 rect_offset2 = { .x = 0.0f, .y = -0.5f };
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
-
-        Point text_loc;
-        text_loc.x = 100;
-        text_loc.y = 700;
-        append_text("BAska", &debug_font_data, text_loc);
-        draw_chars(atlas_texture_id);
 
         Point win_size = get_window_size();
         debug_log("Window: %d,%d\n", win_size.x, win_size.y);

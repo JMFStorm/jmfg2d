@@ -19,3 +19,5 @@ typedef struct vec3 {
 } vec3;
 
 float normalize_to_ndc(s64 px, s64 screen_max);
+
+float normalize_value(float value, float src_max, float dest_max);
