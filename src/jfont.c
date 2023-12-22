@@ -130,23 +130,3 @@ void load_font(FontData* font_data, int font_height_px, const char* font_path)
 	create_font_atlas_texture(font_data, bitmap_width, bitmap_height, bitmap_memory);
 	free(bitmap_memory);
 }
-
-void create_font_atlas_texture(FontData* font_data, s32 bitmap_width, s32 bitmap_height, byte* bitmap_memory)
-{
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	GLuint new_texture;
-	GLuint prev_texture = font_data->texture_id;
-	glDeleteTextures(1, &prev_texture);
-	glGenTextures(1, &new_texture);
-	font_data->texture_id = (int)(new_texture);
-	glBindTexture(GL_TEXTURE_2D, font_data->texture_id);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmap_width, bitmap_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap_memory);
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-}

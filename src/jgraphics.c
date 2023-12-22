@@ -7,12 +7,15 @@
 #include "files.h"
 #include "globals.h"
 #include "jimage.h"
+#include "jfont.h"
+#include "main.h"
 
 void check_shader_compile_error(u32 shader)
 {
     s32 shader_compile_success;
     char info_log[INFO_LOG_LENGTH] = {0};
     glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_compile_success);
+    if (!shader_compile_success) debug_log(info_log);
     assert(shader_compile_success);
 }
 
@@ -21,6 +24,7 @@ void check_shader_link_error(u32 shader)
     s32 shader_compile_success;
     char info_log[INFO_LOG_LENGTH] = {0};
     glGetProgramiv(shader, GL_LINK_STATUS, &shader_compile_success);
+    if (!shader_compile_success) debug_log(info_log);
     assert(shader_compile_success);
 }
 
@@ -218,4 +222,108 @@ void draw_rects(u32 texture_id)
     rects_buffered = 0;
     glUseProgram(0);
     glBindVertexArray(0);
+}
+
+void append_ui_text(FontData* font_data, char* text, vec2 start_pos)
+{
+    CharData* chars = font_data->char_data;
+    char* text_string = text;
+    int length = strlen(text);
+
+    int text_offset_x_px = 0;
+    int text_offset_y_px = 0;
+    int line_height_px = font_data->font_height_px;
+
+    glBindBuffer(GL_ARRAY_BUFFER, ui_text_shader.vbo);
+
+    for (int i = 0; i < length; i++)
+    {
+        char current_char = *text_string++;
+
+        if (current_char == '\n')
+        {
+            text_offset_y_px -= line_height_px;
+            text_offset_x_px = 0;
+            continue;
+        }
+
+        int char_index = (int)(current_char) - 32;
+        CharData current = chars[char_index];
+
+        // Assume font start position is top left corner
+        int char_height_px = current.height;
+        int char_width_px = current.width;
+
+        int x_start = vw_into_screen_px(start_pos.x, user_settings.window_width_px) + current.x_offset + text_offset_x_px;
+        int char_y_offset = current.y_offset;
+        int y_start = vh_into_screen_px(start_pos.y, user_settings.window_height_px) + text_offset_y_px - line_height_px + char_y_offset;
+
+        float x0 = normalize_screen_px_to_ndc(x_start, user_settings.window_width_px);
+        float y0 = normalize_screen_px_to_ndc(y_start, user_settings.window_height_px);
+
+        float x1 = normalize_screen_px_to_ndc(x_start + char_width_px, user_settings.window_width_px);
+        float y1 = normalize_screen_px_to_ndc(y_start + char_height_px, user_settings.window_height_px);
+
+        float vertices[] =
+        {
+            // Coords           // UV
+            x0, y1, 0.0f,       current.UV_x0, current.UV_y1, // top left
+            x0, y0, 0.0f,       current.UV_x0, current.UV_y0, // bottom left
+            x1, y0, 0.0f,       current.UV_x1, current.UV_y0, // bottom right
+
+            x1, y1, 0.0f,       current.UV_x1, current.UV_y1, // top right
+            x0, y1, 0.0f,       current.UV_x0, current.UV_y1, // top left 
+            x1, y0, 0.0f,       current.UV_x1, current.UV_y0  // bottom right
+        };
+
+        s64 bytes_offset = ui_chars_buffered * sizeof(vertices);
+        glBufferSubData(GL_ARRAY_BUFFER, bytes_offset, sizeof(vertices), vertices);
+
+        ui_chars_buffered++;
+        text_offset_x_px += current.advance;
+        text++;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void draw_ui_text(FontData* font_data_ptr, float red, float green, float blue)
+{
+    glUseProgram(ui_text_shader.id);
+    glBindVertexArray(ui_text_shader.vao);
+
+    int color_uniform = glGetUniformLocation(ui_text_shader.id, "textColor");
+    glUniform3f(color_uniform, red, green, blue);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindTexture(GL_TEXTURE_2D, font_data_ptr->texture_id);
+
+    s64 indicies = ui_chars_buffered * 6;
+    glDrawArrays(GL_TRIANGLES, 0, indicies);
+
+    ui_chars_buffered = 0;
+    frame_data.draw_calls++;
+
+    glUseProgram(0);
+    glBindVertexArray(0);
+}
+
+void create_font_atlas_texture(FontData* font_data_ptr, s32 bitmap_width, s32 bitmap_height, byte* bitmap_memory)
+{
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    GLuint new_texture;
+    GLuint prev_texture = font_data_ptr->texture_id;
+    glDeleteTextures(1, &prev_texture);
+    glGenTextures(1, &new_texture);
+    font_data_ptr->texture_id = (int)(new_texture);
+    glBindTexture(GL_TEXTURE_2D, font_data_ptr->texture_id);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bitmap_width, bitmap_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap_memory);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }

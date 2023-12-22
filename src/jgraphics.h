@@ -29,6 +29,6 @@ u32 load_atlas_into_texture(byte* atlas_bitmap, s32 width, s32 height);
 void append_rect(vec2 offset);
 void draw_rects(u32 test_texture_id);
 
-Point append_text(char* text, CharData* char_data, Point px_screen_pos);
-Point append_char(char character, CharData* char_data, Point px_screen_pos);
-void draw_chars(u32 atlas_texture_id);
+void create_font_atlas_texture(FontData* font_data, s32 bitmap_width, s32 bitmap_height, byte* bitmap_memory);
+void append_ui_text(FontData* font_data, char* text, vec2 start_pos);
+void draw_ui_text(FontData* font_data_ptr, float red, float green, float blue);

@@ -190,8 +190,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
     inputs = game_inputs_init();
 
-    FontData debug_font;
-    load_font(&debug_font, 64, "G:\\projects\\game\\JMF_Engine2D\\resources\\fonts\\Inter-Regular.ttf");
+    debug_font_ptr = malloc(sizeof(FontData));
+    load_font(debug_font_ptr, 64, "G:\\projects\\game\\JMF_Engine2D\\resources\\fonts\\Inter-Regular.ttf");
 
     init_shaders();
 
@@ -245,6 +245,12 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         vec2 rect_offset2 = { .x = 0.0f, .y = -0.5f };
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
+
+        vec2 text_start;
+        text_start.x = 5.0f;
+        text_start.y = 50.0f;
+        append_ui_text(debug_font_ptr, "Hallueu\nYee", text_start);
+        draw_ui_text(debug_font_ptr, 1.0f, 1.0f, 1.0f);
 
         Point win_size = get_window_size();
         debug_log("Window: %d,%d\n", win_size.x, win_size.y);

@@ -7,3 +7,6 @@ typedef struct UserSettings {
     int window_height_px;
 } UserSettings;
 
+typedef struct FrameData {
+    s64 draw_calls;
+} FrameData;

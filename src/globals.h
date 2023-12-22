@@ -11,3 +11,9 @@ extern s64 chars_buffered;
 extern CharData debug_font_data;
 
 extern UserSettings user_settings;
+
+extern s64 ui_chars_buffered;
+
+extern FrameData frame_data;
+
+extern FontData* debug_font_ptr;
