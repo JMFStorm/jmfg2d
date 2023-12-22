@@ -29,6 +29,6 @@ u32 load_atlas_into_texture(byte* atlas_bitmap, s32 width, s32 height);
 void append_rect(vec2 offset);
 void draw_rects(u32 test_texture_id);
 
-vec2 append_text(char* text, CharData* char_data, vec2 screen_pos);
-void append_char(char character, CharData* char_data);
+Point append_text(char* text, CharData* char_data, Point px_screen_pos);
+Point append_char(char character, CharData* char_data, Point px_screen_pos);
 void draw_chars(u32 atlas_texture_id);

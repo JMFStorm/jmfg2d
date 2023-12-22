@@ -220,48 +220,60 @@ void draw_rects(u32 texture_id)
     glBindVertexArray(0);
 }
 
-vec2 append_text(char* text, CharData* char_data, vec2 screen_pos)
+Point append_text(char* text, CharData* char_data, Point px_screen_pos)
 {
     s64 length = strlen(text);
+    Point text_cursor = px_screen_pos;
 
     for (int i = 0; i < length; i++)
     {
         char current = text[i];
-
-        s64 c_index = current - 32;
-        s64 c_width = char_data->cdata[c_index].x1 - char_data->cdata[c_index].x0;
-        s64 c_height = char_data->cdata[c_index].y1 - char_data->cdata[c_index].y0;
-        s64 c_advance = char_data->cdata[c_index].xadvance;
-
-        append_char(current, char_data);
+        text_cursor = append_char(current, char_data, text_cursor);
     }
 
-    vec2 next_cursor_pos = {0};
-    return next_cursor_pos;
+    return text_cursor;
 }
 
-void append_char(char character, CharData* char_data)
+Point append_char(char character, CharData* char_data, Point px_screen_pos)
 {
     float uv_top_left[4] = {0};
     float uv_bot_right[4] = {0};
+
+    s64 c_index = character - 32;
+    s64 c_width = char_data->cdata[c_index].x1 - char_data->cdata[c_index].x0;
+    s64 c_height = char_data->cdata[c_index].y1 - char_data->cdata[c_index].y0;
+    s64 c_advance = char_data->cdata[c_index].xadvance;
+
+    vec2 ndc_top_left;
+    ndc_top_left.x = normalize_to_ndc(px_screen_pos.x, user_settings.window_width_px);
+    ndc_top_left.y = normalize_to_ndc(px_screen_pos.y, user_settings.window_height_px);
+
+    vec2 ndc_bot_right;
+    ndc_bot_right.x = normalize_to_ndc(px_screen_pos.x + c_width, user_settings.window_width_px);
+    ndc_bot_right.y = normalize_to_ndc(px_screen_pos.y - c_height, user_settings.window_height_px);
+
     get_char_from_atlas(character, uv_top_left, uv_bot_right, char_data);
 
     float vertices[] =
     {
-        // Coords              // UV
-        -0.25f, -0.25f, 0.0f,  uv_top_left[2],  uv_bot_right[3], // bottom left
-         0.25f, -0.25f, 0.0f,  uv_bot_right[2], uv_bot_right[3], // bottom right
-        -0.25f,  0.25f, 0.0f,  uv_top_left[2],  uv_top_left[3],  // top left
+        // Coords                                // UV
+        ndc_top_left.x,  ndc_bot_right.y, 0.0f,  uv_top_left[2],  uv_bot_right[3], // bottom left
+        ndc_bot_right.x, ndc_bot_right.y, 0.0f,  uv_bot_right[2], uv_bot_right[3], // bottom right
+        ndc_top_left.x,  ndc_top_left.y,  0.0f,  uv_top_left[2],  uv_top_left[3],  // top left
  
-        -0.25f,  0.25f, 0.0f,  uv_top_left[2],  uv_top_left[3],  // top left
-         0.25f, -0.25f, 0.0f,  uv_bot_right[2], uv_bot_right[3], // bottom right
-         0.25f,  0.25f, 0.0f,  uv_bot_right[2], uv_top_left[3]   // top right
+        ndc_top_left.x,  ndc_top_left.y,  0.0f,  uv_top_left[2],  uv_top_left[3],  // top left
+        ndc_bot_right.x, ndc_bot_right.y, 0.0f,  uv_bot_right[2], uv_bot_right[3], // bottom right
+        ndc_bot_right.x, ndc_top_left.y,  0.0f,  uv_bot_right[2], uv_top_left[3]   // top right
     };
 
     s64 bytes_offset = chars_buffered * sizeof(vertices);
     glBindBuffer(GL_ARRAY_BUFFER, ui_text_shader.vbo);
     glBufferSubData(GL_ARRAY_BUFFER, bytes_offset, sizeof(vertices), vertices);
     chars_buffered++;
+
+    Point next_cursor = px_screen_pos;
+    next_cursor.x += c_advance;
+    return next_cursor;
 }
 
 void draw_chars(u32 atlas_texture_id)
@@ -271,7 +283,9 @@ void draw_chars(u32 atlas_texture_id)
     glBindTexture(GL_TEXTURE_2D, atlas_texture_id);
     glUseProgram(ui_text_shader.id);
     glBindVertexArray(ui_text_shader.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    s64 indicies = chars_buffered * 6;
+    glDrawArrays(GL_TRIANGLES, 0, indicies);
 
     chars_buffered = 0;
     glUseProgram(0);

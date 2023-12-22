@@ -18,6 +18,4 @@ typedef struct vec3 {
 	f32 z;
 } vec3;
 
-vec2 vec2_init();
-
-vec3 vec3_init();
+float normalize_to_ndc(s64 px, s64 screen_max);

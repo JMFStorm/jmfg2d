@@ -195,7 +195,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     init_shaders();
 
     const char* font_path = "G:\\projects\\game\\JMF_Engine2D\\resources\\fonts\\Inter-Regular.ttf";
-    u32 atlas_texture_id = init_font_atlas((char*)font_path, 128, &debug_font_data);
+    u32 atlas_texture_id = init_font_atlas((char*)font_path, 64, &debug_font_data);
 
     set_vertical_flip_image_load(true);
     test_texture_id = load_image_to_texture("G:\\projects\\game\\Engine3D\\resources\\materials\\bricks_reclaimed.png");
@@ -252,8 +252,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
 
-        vec2 text_loc = {0};
-        append_text("Uy text", &debug_font_data, text_loc);
+        Point text_loc;
+        text_loc.x = 100;
+        text_loc.y = 700;
+        append_text("BAska", &debug_font_data, text_loc);
         draw_chars(atlas_texture_id);
 
         Point win_size = get_window_size();

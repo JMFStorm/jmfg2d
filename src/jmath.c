@@ -1,13 +1,11 @@
 #include "jmath.h"
 
-vec2 vec2_init()
-{
-	vec2 v2 = {0};
-	return v2;
-}
+#include "globals.h"
+#include "jgame.h"
 
-vec3 vec3_init()
+float normalize_to_ndc(s64 px, s64 screen_max)
 {
-	vec3 v3 = {0};
-	return v3;
+	float x_ndc = px / (screen_max * 0.5f);
+	float res = x_ndc - 1.0f;
+	return res;
 }
