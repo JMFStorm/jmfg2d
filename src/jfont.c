@@ -53,6 +53,7 @@ void load_font(FontData* font_data, int font_height_px, const char* font_path)
 
 	int bitmap_size = bitmap_width * bitmap_height;
 	byte* bitmap_memory = (byte*)malloc(bitmap_size);
+	memset(bitmap_memory, 0x00, bitmap_size);
 
 	// Add spacebar
 	{

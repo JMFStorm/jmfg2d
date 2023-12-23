@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "constants.h"
 #include "globals.h"
 #include "jimage.h"
 #include "jinput.h"
@@ -191,7 +192,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     inputs = game_inputs_init();
 
     debug_font_ptr = malloc(sizeof(FontData));
-    load_font(debug_font_ptr, 64, "G:\\projects\\game\\JMF_Engine2D\\resources\\fonts\\Inter-Regular.ttf");
+    load_font(debug_font_ptr, DEBUG_FONT_SIZE, "G:\\projects\\game\\JMF_Engine2D\\resources\\fonts\\Inter-Regular.ttf");
 
     init_shaders();
 
@@ -242,15 +243,17 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        vec2 rect_offset2 = { .x = 0.0f, .y = -0.5f };
+        vec2 rect_offset2 = { 0.0f, -0.5f };
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
 
-        vec2 text_start;
-        text_start.x = 5.0f;
-        text_start.y = 50.0f;
-        append_ui_text(debug_font_ptr, "Hallueu\nYee", text_start);
-        draw_ui_text(debug_font_ptr, 1.0f, 1.0f, 1.0f);
+        Point text_cursor = { 100, 800 };
+        text_cursor = append_ui_text(debug_font_ptr, "A newline\n", text_cursor);
+        text_cursor = append_ui_text(debug_font_ptr, "BC newline\n", text_cursor);
+        text_cursor = append_ui_text(debug_font_ptr, "helpp Delicious!\n", text_cursor);
+
+        vec3 text_color = { 0.2f, 1.0f, 1.0f };
+        draw_ui_text(debug_font_ptr, text_color);
 
         Point win_size = get_window_size();
         debug_log("Window: %d,%d\n", win_size.x, win_size.y);

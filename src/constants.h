@@ -12,3 +12,5 @@
 #define BITMAP_WIDTH  BITMAP_HEIGHT
 #define FIRST_CHAR 32
 #define CHARS_SIZE 96 
+
+#define DEBUG_FONT_SIZE 64

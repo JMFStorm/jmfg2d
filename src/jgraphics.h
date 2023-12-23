@@ -30,5 +30,6 @@ void append_rect(vec2 offset);
 void draw_rects(u32 test_texture_id);
 
 void create_font_atlas_texture(FontData* font_data, s32 bitmap_width, s32 bitmap_height, byte* bitmap_memory);
-void append_ui_text(FontData* font_data, char* text, vec2 start_pos);
-void draw_ui_text(FontData* font_data_ptr, float red, float green, float blue);
+Point append_ui_text(FontData* font_data, char* text, Point start_px);
+void draw_ui_text(FontData* font_data_ptr, vec3 color);
+

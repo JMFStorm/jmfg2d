@@ -224,15 +224,19 @@ void draw_rects(u32 texture_id)
     glBindVertexArray(0);
 }
 
-void append_ui_text(FontData* font_data, char* text, vec2 start_pos)
+Point append_ui_text(FontData* font_data, char* text, Point start_px)
 {
     CharData* chars = font_data->char_data;
     char* text_string = text;
     int length = strlen(text);
 
+    int last_advance = 0;
     int text_offset_x_px = 0;
     int text_offset_y_px = 0;
-    int line_height_px = font_data->font_height_px;
+
+    Point next_cursor = start_px;
+
+    // Assume font cursor start position is top left corner
 
     glBindBuffer(GL_ARRAY_BUFFER, ui_text_shader.vbo);
 
@@ -242,27 +246,32 @@ void append_ui_text(FontData* font_data, char* text, vec2 start_pos)
 
         if (current_char == '\n')
         {
-            text_offset_y_px -= line_height_px;
             text_offset_x_px = 0;
+            last_advance = 0;
+            text_offset_y_px -= font_data->font_height_px;
+
+            next_cursor.x = start_px.x;
+            next_cursor.y = start_px.y + text_offset_y_px;
+
             continue;
         }
 
         int char_index = (int)(current_char) - 32;
         CharData current = chars[char_index];
 
-        // Assume font start position is top left corner
-        int char_height_px = current.height;
-        int char_width_px = current.width;
+        int x_offsets = current.x_offset + text_offset_x_px;
+        int new_x = start_px.x + x_offsets;
+        next_cursor.x = start_px.x;
 
-        int x_start = vw_into_screen_px(start_pos.x, user_settings.window_width_px) + current.x_offset + text_offset_x_px;
-        int char_y_offset = current.y_offset;
-        int y_start = vh_into_screen_px(start_pos.y, user_settings.window_height_px) + text_offset_y_px - line_height_px + char_y_offset;
+        int y_offsets = text_offset_y_px + current.y_offset;
+        int new_y = start_px.y + y_offsets;
+        next_cursor.y = start_px.y;
 
-        float x0 = normalize_screen_px_to_ndc(x_start, user_settings.window_width_px);
-        float y0 = normalize_screen_px_to_ndc(y_start, user_settings.window_height_px);
+        float x0 = normalize_screen_px_to_ndc(new_x, user_settings.window_width_px);
+        float y0 = normalize_screen_px_to_ndc(new_y, user_settings.window_height_px);
 
-        float x1 = normalize_screen_px_to_ndc(x_start + char_width_px, user_settings.window_width_px);
-        float y1 = normalize_screen_px_to_ndc(y_start + char_height_px, user_settings.window_height_px);
+        float x1 = normalize_screen_px_to_ndc(new_x + current.width, user_settings.window_width_px);
+        float y1 = normalize_screen_px_to_ndc(new_y + current.height, user_settings.window_height_px);
 
         float vertices[] =
         {
@@ -281,19 +290,23 @@ void append_ui_text(FontData* font_data, char* text, vec2 start_pos)
 
         ui_chars_buffered++;
         text_offset_x_px += current.advance;
+        last_advance = current.advance;
         text++;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    next_cursor.x += last_advance;
+    return next_cursor;
 }
 
-void draw_ui_text(FontData* font_data_ptr, float red, float green, float blue)
+void draw_ui_text(FontData* font_data_ptr, vec3 color)
 {
     glUseProgram(ui_text_shader.id);
     glBindVertexArray(ui_text_shader.vao);
 
     int color_uniform = glGetUniformLocation(ui_text_shader.id, "textColor");
-    glUniform3f(color_uniform, red, green, blue);
+    glUniform3f(color_uniform, color.x, color.y, color.z);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, font_data_ptr->texture_id);
