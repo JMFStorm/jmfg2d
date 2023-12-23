@@ -125,7 +125,7 @@ HWND create_window(WNDCLASSEX wc, int width, int height)
 {
     HWND handle = CreateWindow(
         wc.lpszClassName,       // lpClassName: Pointer to a null-terminated string or a class atom.
-        L"JMF Engine",          // lpWindowName: Pointer to a null-terminated string that specifies the window name.
+        L"jmfg2d",          // lpWindowName: Pointer to a null-terminated string that specifies the window name.
         WS_OVERLAPPED 
         | WS_SYSMENU 
         | WS_CAPTION
@@ -192,12 +192,12 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     inputs = game_inputs_init();
 
     debug_font_ptr = malloc(sizeof(FontData));
-    load_font(debug_font_ptr, DEBUG_FONT_SIZE, "G:\\projects\\game\\JMF_Engine2D\\resources\\fonts\\Inter-Regular.ttf");
+    load_font(debug_font_ptr, DEBUG_FONT_SIZE, "G:\\projects\\game\\jmfg2d\\resources\\fonts\\Inter-Regular.ttf");
 
     init_shaders();
 
     set_vertical_flip_image_load(true);
-    test_texture_id = load_image_to_texture("G:\\projects\\game\\Engine3D\\resources\\materials\\bricks_reclaimed.png");
+    test_texture_id = load_image_to_texture("G:\\projects\\game\\jmfg2d\\resources\\images\\bricks_reclaimed.png");
 
     ShowWindow(window_handle, cmd_show);
     UpdateWindow(window_handle);

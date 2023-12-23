@@ -63,8 +63,8 @@ u32 compile_shader(char* vertex_shader_path, char* fragment_shader_path)
 
 void init_rectangle_shader()
 {
-    const char* vertex_shader_path   = "G:/projects/game/JMF_Engine2D/resources/shaders/rectangle_vs.glsl";
-    const char* fragment_shader_path = "G:/projects/game/JMF_Engine2D/resources/shaders/rectangle_fs.glsl";
+    const char* vertex_shader_path   = "G:/projects/game/jmfg2d/resources/shaders/rectangle_vs.glsl";
+    const char* fragment_shader_path = "G:/projects/game/jmfg2d/resources/shaders/rectangle_fs.glsl";
 
     BaseShader base_shader = {0};
     base_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
@@ -115,8 +115,8 @@ void init_rectangle_shader()
 
 void init_text_shader()
 {
-    const char* vertex_shader_path   = "G:/projects/game/JMF_Engine2D/resources/shaders/ui_text_vs.glsl";
-    const char* fragment_shader_path = "G:/projects/game/JMF_Engine2D/resources/shaders/ui_text_fs.glsl";
+    const char* vertex_shader_path   = "G:/projects/game/jmfg2d/resources/shaders/ui_text_vs.glsl";
+    const char* fragment_shader_path = "G:/projects/game/jmfg2d/resources/shaders/ui_text_fs.glsl";
 
     ui_text_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
 

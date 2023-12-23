@@ -7,6 +7,6 @@ if not defined VC_ENV_SET (
 
 setlocal
 
-cl src\*.c /Zi /DEBUG /D DEBUG_BUILD /MTd /I"include" /Fo.\debug\obj\ /Fedebug\JMF_Engine2D.exe /link /NODEFAULTLIB:LIBCMT /LIBPATH:"lib" user32.lib opengl32.lib gdi32.lib freetype.lib
+cl src\*.c /Zi /DEBUG /D DEBUG_BUILD /MTd /I"include" /Fo.\debug\obj\ /Fedebug\jmfg2d.exe /link /NODEFAULTLIB:LIBCMT /LIBPATH:"lib" user32.lib opengl32.lib gdi32.lib freetype.lib
 
 endlocal
