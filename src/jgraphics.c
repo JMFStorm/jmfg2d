@@ -230,7 +230,6 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
     char* text_string = text;
     int length = strlen(text);
 
-    int last_advance = 0;
     int text_offset_x_px = 0;
     int text_offset_y_px = 0;
 
@@ -249,8 +248,7 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
         if (current_char == '\n')
         {
             text_offset_x_px = 0;
-            last_advance = 0;
-            text_offset_y_px -= font_data->font_height_px;
+            text_offset_y_px += font_data->font_height_px;
 
             next_cursor.x = start_px.x;
             next_cursor.y = start_px.y + text_offset_y_px;
@@ -263,11 +261,9 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
 
         int x_offsets = current.x_offset + text_offset_x_px;
         int new_x = start_px.x + x_offsets;
-        next_cursor.x = start_px.x;
 
         int y_offsets = text_offset_y_px + current.y_offset;
         int new_y = user_settings.window_height_px - (start_px.y - y_offsets);
-        next_cursor.y = start_px.y;
 
         float x0 = normalize_screen_px_to_ndc(new_x, user_settings.window_width_px);
         float y0 = normalize_screen_px_to_ndc(new_y, user_settings.window_height_px);
@@ -291,14 +287,12 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
         glBufferSubData(GL_ARRAY_BUFFER, bytes_offset, sizeof(vertices), vertices);
 
         ui_chars_buffered++;
+        next_cursor.x += current.advance;
         text_offset_x_px += current.advance;
-        last_advance = current.advance;
         text++;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    next_cursor.x += last_advance;
     return next_cursor;
 }
 
