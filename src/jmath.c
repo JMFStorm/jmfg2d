@@ -18,3 +18,15 @@ float normalize_screen_px_to_ndc(int value, int max)
 	float res = -1.0f + this2;
 	return res;
 }
+
+s64 vw_to_screen_px(float vw)
+{
+	float result = vw * (float)user_settings.window_width_px * 0.01f;
+	return result;
+}
+
+s64 vh_to_screen_px(float vh)
+{
+	float result = vh * (float)user_settings.window_height_px * 0.01f;
+	return result;
+}

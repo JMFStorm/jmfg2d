@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "globals.h"
 #include "jimage.h"
+#include "jgame.h"
 #include "jinput.h"
 #include "jmath.h"
 #include "types.h"
@@ -42,6 +43,9 @@ Point get_window_size()
 
 void set_window_size(s32 width_px, s32 height_px)
 {
+    user_settings.window_width_px = width_px;
+    user_settings.window_height_px = height_px;
+    load_font(debug_font_ptr, get_debug_font_size(), "G:\\projects\\game\\jmfg2d\\resources\\fonts\\Inter-Regular.ttf");
     SetWindowPos(window_handle, NULL, 0, 0, width_px, height_px, SWP_NOMOVE | SWP_NOZORDER);
 }
 
@@ -192,7 +196,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     inputs = game_inputs_init();
 
     debug_font_ptr = malloc(sizeof(FontData));
-    load_font(debug_font_ptr, DEBUG_FONT_SIZE, "G:\\projects\\game\\jmfg2d\\resources\\fonts\\Inter-Regular.ttf");
+    load_font(debug_font_ptr, get_debug_font_size(), "G:\\projects\\game\\jmfg2d\\resources\\fonts\\Inter-Regular.ttf");
 
     init_shaders();
 
@@ -201,6 +205,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
     ShowWindow(window_handle, cmd_show);
     UpdateWindow(window_handle);
+
     set_window_size(user_settings.window_width_px, user_settings.window_height_px);
 
     MSG msg;
@@ -247,16 +252,16 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
 
-        Point text_cursor = { 100, 800 };
+        Point text_cursor = {
+            vw_to_screen_px(10.0f),
+            vh_to_screen_px(10.0f)
+        };
         text_cursor = append_ui_text(debug_font_ptr, "A newline\n", text_cursor);
         text_cursor = append_ui_text(debug_font_ptr, "BC newline\n", text_cursor);
         text_cursor = append_ui_text(debug_font_ptr, "helpp Delicious!\n", text_cursor);
 
         vec3 text_color = { 0.2f, 1.0f, 1.0f };
         draw_ui_text(debug_font_ptr, text_color);
-
-        Point win_size = get_window_size();
-        debug_log("Window: %d,%d\n", win_size.x, win_size.y);
 
         SwapBuffers(device_context);
     }

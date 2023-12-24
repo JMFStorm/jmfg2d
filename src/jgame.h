@@ -10,3 +10,5 @@ typedef struct UserSettings {
 typedef struct FrameData {
     s64 draw_calls;
 } FrameData;
+
+float get_debug_font_size();
