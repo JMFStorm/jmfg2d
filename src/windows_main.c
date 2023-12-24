@@ -252,18 +252,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
 
-        Point text_cursor = {
-            vw_to_screen_px(10.0f),
-            vh_to_screen_px(10.0f)
-        };
-        text_cursor = append_ui_text(debug_font_ptr, "A newline\n", text_cursor);
-        text_cursor = append_ui_text(debug_font_ptr, "BC newline\n", text_cursor);
-        text_cursor = append_ui_text(debug_font_ptr, "helpp Delicious!\n", text_cursor);
-
-        vec3 text_color = { 0.2f, 1.0f, 1.0f };
-        draw_ui_text(debug_font_ptr, text_color);
+        print_debug_info();
 
         SwapBuffers(device_context);
+        system_data.frames_drawn++;
     }
 
     wglMakeCurrent(NULL, NULL);
@@ -273,3 +265,4 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     UnregisterClass(window_class.lpszClassName, window_class.hInstance);
     return 0;
 }
+

@@ -11,4 +11,10 @@ typedef struct FrameData {
     s64 draw_calls;
 } FrameData;
 
+typedef struct SystemData {
+    u64 frames_drawn;
+} SystemData;
+
 float get_debug_font_size();
+
+void print_debug_info();

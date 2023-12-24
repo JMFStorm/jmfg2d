@@ -14,4 +14,6 @@ s64 ui_chars_buffered = 0;
 
 FrameData frame_data = {0};
 
+SystemData system_data = {0};
+
 FontData* debug_font_ptr = NULL;

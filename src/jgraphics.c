@@ -234,9 +234,11 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
     int text_offset_x_px = 0;
     int text_offset_y_px = 0;
 
+    // Assume font cursor start position is screen top left corner
+
     Point next_cursor = start_px;
 
-    // Assume font cursor start position is top left corner
+    // Assume font UV start position is top left corner
 
     glBindBuffer(GL_ARRAY_BUFFER, ui_text_shader.vbo);
 
@@ -264,7 +266,7 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
         next_cursor.x = start_px.x;
 
         int y_offsets = text_offset_y_px + current.y_offset;
-        int new_y = start_px.y + y_offsets;
+        int new_y = user_settings.window_height_px - (start_px.y - y_offsets);
         next_cursor.y = start_px.y;
 
         float x0 = normalize_screen_px_to_ndc(new_x, user_settings.window_width_px);
