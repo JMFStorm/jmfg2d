@@ -180,12 +180,47 @@ HGLRC create_opengl_context()
     return context;
 }
 
+u64 get_performance_frequency()
+{
+    LARGE_INTEGER frequency;
+    QueryPerformanceFrequency(&frequency);
+    u64 result = (u64)frequency.QuadPart;
+    return result;
+}
+
+void init_performance_counter()
+{
+    system_data.perf_counter_freq = get_performance_frequency();
+    system_data.elapsed_time_ms = 0;
+
+    LARGE_INTEGER time;
+    QueryPerformanceCounter(&time);
+    system_data.prev_perf_counter = (u64)time.QuadPart;
+
+    frame_data.deltatime_ms = 0.0f;
+}
+
+void update_performance_counter()
+{
+    LARGE_INTEGER time;
+    QueryPerformanceCounter(&time);
+    system_data.perf_counter = (u64)time.QuadPart;
+
+    f64 diff = (f64)(system_data.perf_counter - system_data.prev_perf_counter);
+    frame_data.deltatime_ms = (diff * 1000.0f) / system_data.perf_counter_freq;
+
+    system_data.elapsed_time_ms += frame_data.deltatime_ms;
+    system_data.prev_perf_counter = system_data.perf_counter;
+}
+
 u32 test_texture_id;
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show)
 {
     user_settings.window_width_px = 1600;
     user_settings.window_height_px = 1200;
+
+    init_performance_counter();
 
     window_class = register_and_create_window_class();
     window_handle = create_window(window_class, user_settings.window_width_px, user_settings.window_height_px);
@@ -242,6 +277,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
             window_size.y -= 100;
             set_window_size(window_size.x, window_size.y);
         }
+
+        update_performance_counter();
 
         glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);

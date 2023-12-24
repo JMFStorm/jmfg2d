@@ -18,7 +18,9 @@ void print_debug_info()
         vh_to_screen_px(3.0f)
     };
 
-    sprintf(str, "FPS: %llu Frames: %llu", NULL, system_data.frames_drawn);
+    f64 time = system_data.elapsed_time_ms;
+
+    sprintf(str, "Time elapsed: %.2fms Frames: %llu", time, system_data.frames_drawn);
     cursor = append_ui_text(debug_font_ptr, str, cursor);
 
     vec3 text_color = { 1.0f, 1.0f, 1.0f };
