@@ -289,6 +289,18 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         append_rect(rect_offset2);
         draw_rects(test_texture_id);
 
+        vec3 dot_color = { 1, 1, 1 };
+
+        for (int i = 0; i < 10; i++)
+        {
+            vec3 dot_pos = { 0, 0, 0 };
+            dot_pos.x = (5.0f * i) / 100;
+            dot_pos.y = (5.0f * i) / 100;
+            append_dot(dot_pos, dot_color);
+        }
+
+        draw_dots(2.0f);
+
         print_debug_info();
 
         SwapBuffers(device_context);

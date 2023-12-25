@@ -66,14 +66,13 @@ void init_rectangle_shader()
     const char* vertex_shader_path   = "G:/projects/game/jmfg2d/resources/shaders/rectangle_vs.glsl";
     const char* fragment_shader_path = "G:/projects/game/jmfg2d/resources/shaders/rectangle_fs.glsl";
 
-    BaseShader base_shader = {0};
-    base_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
+    rect_shader.base_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
 
-    glGenVertexArrays(1, &base_shader.vao);
-    glGenBuffers(1, &base_shader.vbo);
+    glGenVertexArrays(1, &rect_shader.base_shader.vao);
+    glGenBuffers(1, &rect_shader.vbo);
 
-    glBindVertexArray(base_shader.vao);
-    glBindBuffer(GL_ARRAY_BUFFER, base_shader.vbo);
+    glBindVertexArray(rect_shader.base_shader.vao);
+    glBindBuffer(GL_ARRAY_BUFFER, rect_shader.vbo);
 
     float vertices[] =
     {
@@ -86,8 +85,6 @@ void init_rectangle_shader()
          0.25f, -0.25f, 0.0f,  1.0f, 0.0f, // bottom right
          0.25f,  0.25f, 0.0f,  1.0f, 1.0f  // top right
     };
-
-    rect_shader.base_shader = base_shader;
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -118,12 +115,12 @@ void init_text_shader()
     const char* vertex_shader_path   = "G:/projects/game/jmfg2d/resources/shaders/ui_text_vs.glsl";
     const char* fragment_shader_path = "G:/projects/game/jmfg2d/resources/shaders/ui_text_fs.glsl";
 
-    ui_text_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
+    ui_text_shader.base_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
 
-    glGenVertexArrays(1, &ui_text_shader.vao);
+    glGenVertexArrays(1, &ui_text_shader.base_shader.vao);
     glGenBuffers(1, &ui_text_shader.vbo);
 
-    glBindVertexArray(ui_text_shader.vao);
+    glBindVertexArray(ui_text_shader.base_shader.vao);
     glBindBuffer(GL_ARRAY_BUFFER, ui_text_shader.vbo);
 
     s64 vbo_size = (sizeof(float) * 5 * 6) * MAX_BUFFERED_TEXT;
@@ -141,10 +138,39 @@ void init_text_shader()
     glBindVertexArray(0);
 }
 
+void init_dot_shader()
+{
+    const char* vertex_shader_path   = "G:/projects/game/jmfg2d/resources/shaders/dot_vs.glsl";
+    const char* fragment_shader_path = "G:/projects/game/jmfg2d/resources/shaders/dot_fs.glsl";
+
+    dot_shader.base_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
+
+    glGenVertexArrays(1, &dot_shader.base_shader.vao);
+    glGenBuffers(1, &dot_shader.vbo);
+
+    glBindVertexArray(dot_shader.base_shader.vao);
+    glBindBuffer(GL_ARRAY_BUFFER, dot_shader.vbo);
+
+    s64 vbo_size = (sizeof(float) * 6) * MAX_BUFFERED_DOTS;
+    glBufferData(GL_ARRAY_BUFFER, vbo_size, NULL, GL_DYNAMIC_DRAW);
+
+    // Coord attribute 0
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Color attribute 1
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(sizeof(float) * 3));
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
 void init_shaders()
 {
 	init_rectangle_shader();
     init_text_shader();
+    init_dot_shader();
 }
 
 void set_draw_area(s32 start_x, s32 start_y, s32 end_x, s32 end_y)
@@ -224,6 +250,39 @@ void draw_rects(u32 texture_id)
     glBindVertexArray(0);
 }
 
+void append_dot(vec3 position, vec3 color)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, dot_shader.vbo);
+
+    float vertices[] =
+    {
+        // Coords                           // Color
+        position.x, position.y, position.z, color.x, color.y, color.z,
+    };
+
+    s64 bytes_offset = dots_buffered * sizeof(vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, bytes_offset, sizeof(vertices), vertices);
+
+    dots_buffered++;
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void draw_dots(f32 size_px)
+{
+    glUseProgram(dot_shader.base_shader.id);
+    glBindVertexArray(dot_shader.base_shader.vao);
+
+    s64 indicies = dots_buffered;
+    glPointSize(size_px);
+    glDrawArrays(GL_POINTS, 0, indicies);
+
+    dots_buffered = 0;
+    frame_data.draw_calls++;
+
+    glUseProgram(0);
+    glBindVertexArray(0);
+}
+
 Point append_ui_text(FontData* font_data, char* text, Point start_px)
 {
     CharData* chars = font_data->char_data;
@@ -298,10 +357,10 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
 
 void draw_ui_text(FontData* font_data_ptr, vec3 color)
 {
-    glUseProgram(ui_text_shader.id);
-    glBindVertexArray(ui_text_shader.vao);
+    glUseProgram(ui_text_shader.base_shader.id);
+    glBindVertexArray(ui_text_shader.base_shader.vao);
 
-    int color_uniform = glGetUniformLocation(ui_text_shader.id, "textColor");
+    int color_uniform = glGetUniformLocation(ui_text_shader.base_shader.id, "textColor");
     glUniform3f(color_uniform, color.x, color.y, color.z);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
