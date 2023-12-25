@@ -39,3 +39,6 @@ void draw_ui_text(FontData* font_data_ptr, vec3 color);
 
 void append_dot(vec3 position, vec3 color);
 void draw_dots(f32 size_px);
+
+void append_line(vec3 start, vec3 end, vec3 color);
+void draw_lines(f32 width_px);

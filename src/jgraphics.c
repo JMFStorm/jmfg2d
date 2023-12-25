@@ -250,6 +250,40 @@ void draw_rects(u32 texture_id)
     glBindVertexArray(0);
 }
 
+void append_line(vec3 start, vec3 end, vec3 color)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, dot_shader.vbo);
+
+    float vertices[] =
+    {
+        // Coords                   // Color
+        start.x, start.y, start.z,  color.x, color.y, color.z,
+        end.x,   end.y,   end.z,    color.x, color.y, color.z,
+    };
+
+    s64 bytes_offset = dots_buffered * sizeof(vertices);
+    glBufferSubData(GL_ARRAY_BUFFER, bytes_offset, sizeof(vertices), vertices);
+
+    dots_buffered += 2;
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void draw_lines(f32 width_px)
+{
+    glUseProgram(dot_shader.base_shader.id);
+    glBindVertexArray(dot_shader.base_shader.vao);
+
+    s64 indicies = dots_buffered * 2;
+    glLineWidth(width_px);
+    glDrawArrays(GL_LINES, 0, indicies);
+
+    dots_buffered = 0;
+    frame_data.draw_calls++;
+
+    glUseProgram(0);
+    glBindVertexArray(0);
+}
+
 void append_dot(vec3 position, vec3 color)
 {
     glBindBuffer(GL_ARRAY_BUFFER, dot_shader.vbo);
