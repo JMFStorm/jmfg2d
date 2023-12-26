@@ -317,6 +317,52 @@ void draw_dots(f32 size_px)
     glBindVertexArray(0);
 }
 
+void draw_rect(Point start, Point end)
+{
+    vec3 top_left = {
+        normalize_screen_px_to_ndc(start.x, user_settings.window_width_px),
+        normalize_screen_px_to_ndc(start.y, user_settings.window_height_px),
+        0
+    };
+    vec3 bot_right = {
+        normalize_screen_px_to_ndc(end.x, user_settings.window_width_px),
+        normalize_screen_px_to_ndc(end.y, user_settings.window_height_px),
+        0
+    };
+    vec3 top_right = {
+        top_left.x + (bot_right.x - top_left.x),
+        top_left.y,
+        0
+    };
+    vec3 bot_left = {
+        top_left.x,
+        bot_right.y,
+        0
+    };
+    vec3 color = { 1, 1, 1 };
+    append_line(top_left, top_right, color);
+    append_line(top_left, bot_left, color);
+    append_line(bot_right, top_right, color);
+    append_line(bot_right, bot_left, color);
+    draw_lines(1.0f);
+}
+
+Point append_ui_text_debug(FontData* font_data, char* text, Point start_px)
+{
+    Point next_cursor = append_ui_text(font_data, text, start_px);
+
+    Point start;
+    start.x = start_px.x;
+    start.y = user_settings.window_height_px - start_px.y + font_data->font_height_px;
+
+    Point end;
+    end.x = next_cursor.x;
+    end.y = user_settings.window_height_px - next_cursor.y;
+
+    draw_rect(start, end);
+    return next_cursor;
+}
+
 Point append_ui_text(FontData* font_data, char* text, Point start_px)
 {
     CharData* chars = font_data->char_data;
@@ -341,11 +387,9 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
         if (current_char == '\n')
         {
             text_offset_x_px = 0;
-            text_offset_y_px += font_data->font_height_px;
-
+            text_offset_y_px -= font_data->font_height_px;
             next_cursor.x = start_px.x;
-            next_cursor.y = start_px.y + text_offset_y_px;
-
+            next_cursor.y = start_px.y - text_offset_y_px;
             continue;
         }
 
