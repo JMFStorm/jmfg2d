@@ -20,7 +20,7 @@ HGLRC opengl_context;
 GameInputs inputs;
 
 void debug_log(const char* str_format, ...) {
-#ifdef DEBUG_BUILD
+#ifdef _DEBUG
         char d_msg[256];
         va_list args;
         va_start(args, str_format);
@@ -78,15 +78,30 @@ void set_buttons_states() {
 
 LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
         switch (msg) {
-                case WM_DESTROY:
+                case WM_DESTROY: {
                         PostQuitMessage(0);
                         return 0;
+                }
                 
-                case WM_SIZE:
+                case WM_SIZE: {
                         s32 new_width = LOWORD(l_param);
                         s32 new_height = HIWORD(l_param);
                         set_draw_area(0, 0, new_width, new_height);
                         return 0;
+                }
+
+                case WM_MOUSEMOVE: {
+                        POINT p;
+                        RECT screen;
+                        GetCursorPos(&p);
+                        ScreenToClient(hwnd, &p);
+                        GetClientRect(hwnd, &screen);
+
+                        s32 height = screen.bottom - screen.top;
+                        frame_data.mouse_pos.x = p.x;
+                        frame_data.mouse_pos.y = height - p.y;
+                        return 0;
+                }
                 
                 case WM_PAINT:
                         return 0;
@@ -108,7 +123,7 @@ WNDCLASSEX register_and_create_window_class() {
         wc.hCursor = NULL;
         wc.hbrBackground = NULL;
         wc.lpszMenuName = NULL;
-        wc.lpszClassName = L"MyWindowClass";
+        wc.lpszClassName = L"jmfg2dWindowClass";
         wc.hIconSm = NULL;
      
         RegisterClassEx(&wc);
@@ -123,8 +138,9 @@ HWND create_window(WNDCLASSEX wc, int width, int height)
                 WS_OVERLAPPED 
                 | WS_SYSMENU 
                 | WS_CAPTION
-                | WS_MINIMIZEBOX
-                | WS_MAXIMIZEBOX,       // dwStyle: Window style.
+                // | WS_MAXIMIZEBOX
+                | WS_MINIMIZEBOX,
+                                        // dwStyle: Window style.
                 100, 100,               // x, y: Initial position of the window.
                 width,                  // nWidth:
                 height,                 // nHeight: Width and height of the window.
@@ -267,7 +283,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
           
                 vec2 rect_offset2 = { 0.0f, -0.5f };
-                append_rect(rect_offset2);
+                vec3 rect_color = { 1.0f, 1.0f, 1.0f };
+                append_rect(rect_offset2, rect_color);
                 draw_rects(test_texture_id);
           
                 print_debug_info();

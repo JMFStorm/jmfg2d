@@ -98,13 +98,18 @@ void init_rectangle_shader()
 
     // Offsets instanced attribute 2
     s64 offsets_size = sizeof(float) * MAX_BUFFERED_RECTS;
-    glGenBuffers(1, &rect_shader.offset_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, rect_shader.offset_vbo);
+    glGenBuffers(1, &rect_shader.vertex_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, rect_shader.vertex_vbo);
     glBufferData(GL_ARRAY_BUFFER, offsets_size, NULL, GL_DYNAMIC_DRAW);
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    // Colors instanced attribute 3
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(2);
     glVertexAttribDivisor(2, 1);
+
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(sizeof(float) * 2));
+    glEnableVertexAttribArray(3);
+    glVertexAttribDivisor(3, 1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -225,11 +230,11 @@ u32 load_atlas_into_texture(byte* atlas_bitmap, s32 width, s32 height)
     return texture_id;
 }
 
-void append_rect(vec2 offset)
+void append_rect(vec2 offset, vec3 color)
 {
-    s64 bytes_offset = rects_buffered * sizeof(vec2);
-    glBindBuffer(GL_ARRAY_BUFFER, rect_shader.offset_vbo);
-    float as_floats[2] = {offset.x, offset.y };
+    s64 bytes_offset = rects_buffered * (sizeof(vec2) + sizeof(vec3));
+    glBindBuffer(GL_ARRAY_BUFFER, rect_shader.vertex_vbo);
+    float as_floats[5] = {offset.x, offset.y, color.x, color.y, color.z };
     glBufferSubData(GL_ARRAY_BUFFER, bytes_offset, sizeof(as_floats), as_floats);
     rects_buffered++;
 }

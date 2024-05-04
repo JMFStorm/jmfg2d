@@ -17,7 +17,7 @@ typedef struct SimpleShader {
 typedef struct RectangleShader {
     BaseShader base_shader;
     u32 vbo;
-    u32 offset_vbo;
+    u32 vertex_vbo;
 } RectangleShader;
 
 void check_shader_compile_error(u32 shader);
@@ -30,7 +30,7 @@ void set_draw_area(s32 start_x, s32 start_y, s32 end_x, s32 end_y);
 
 u32 load_atlas_into_texture(byte* atlas_bitmap, s32 width, s32 height);
 
-void append_rect(vec2 offset);
+void append_rect(vec2 offset, vec3 color);
 void draw_rects(u32 test_texture_id);
 
 void create_font_atlas_texture(FontData* font_data, s32 bitmap_width, s32 bitmap_height, byte* bitmap_memory);

@@ -8,3 +8,5 @@ release/
 *.obj
 
 .vs
+
+x64/

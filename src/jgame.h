@@ -10,6 +10,7 @@ typedef struct UserSettings {
 typedef struct FrameData {
     s64 draw_calls;
     f64 deltatime_ms;
+    vec2 mouse_pos;
 } FrameData;
 
 typedef struct SystemData {

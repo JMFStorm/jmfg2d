@@ -18,13 +18,13 @@ void print_debug_info() {
         f64 time = system_data.elapsed_time_ms;
 
         char str[100] = { 0 };
-        sprintf(str, "Time elapsed: %.2fms", time);
+        sprintf_s(str, 100, "Time elapsed: %.2fms", time);
         append_ui_text(debug_font_ptr, str, cursor);
 
         cursor.y = vh_to_screen_px(7.0f);
 
         char str2[100] = { 0 };
-        sprintf(str2, "Frames: %llu", system_data.frames_drawn);
+        sprintf_s(str2, 100, "Frames: %llu", system_data.frames_drawn);
         append_ui_text(debug_font_ptr, str2, cursor);
 
         vec3 text_color = { 1.0f, 1.0f, 1.0f };

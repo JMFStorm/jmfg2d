@@ -13,7 +13,7 @@ void read_file_to_ptr(char* filepath, char* buffer, s64 max_bytes) {
 	FILE *file;
         s64 file_size;
 
-        file = fopen(filepath, "rb");
+        fopen_s(&file, filepath, "rb");
         assert(file);
 
         fseek(file, 0, SEEK_END);
