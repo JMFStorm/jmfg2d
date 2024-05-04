@@ -6,3 +6,5 @@ release/
 *.ilk
 *.exe
 *.obj
+
+.vs

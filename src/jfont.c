@@ -8,8 +8,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H  
 
-void load_font(FontData* font_data, int font_height_px, const char* font_path)
-{
+void load_font(FontData* font_data, int font_height_px, const char* font_path) {
 	FT_Library ft_lib;
 	FT_Face ft_face;
 
@@ -22,6 +21,8 @@ void load_font(FontData* font_data, int font_height_px, const char* font_path)
 	FT_Set_Pixel_Sizes(ft_face, 0, font_height_px);
 	font_data->font_height_px = font_height_px;
 
+	unsigned int padding = 4;
+
 	unsigned int bitmap_width = 0;
 	unsigned int bitmap_height = 0;
 
@@ -33,8 +34,7 @@ void load_font(FontData* font_data, int font_height_px, const char* font_path)
 	// Add spacebar
 	bitmap_width += spacebar_width;
 
-	for (int c = starting_char; c < last_char; c++)
-	{
+	for (int c = starting_char; c < last_char; c++) {
 		char character = (char)(c);
 
 		FT_Error load_char_err = FT_Load_Char(ft_face, character, FT_LOAD_RENDER);
@@ -48,7 +48,7 @@ void load_font(FontData* font_data, int font_height_px, const char* font_path)
 			bitmap_height = glyph_height;
 		}
 
-		bitmap_width += glyph_width;
+		bitmap_width += glyph_width + padding;
 	}
 
 	int bitmap_size = bitmap_width * bitmap_height;
@@ -57,8 +57,7 @@ void load_font(FontData* font_data, int font_height_px, const char* font_path)
 
 	// Add spacebar
 	{
-		for (int y = 0; y < bitmap_height; y++)
-		{
+		for (int y = 0; y < bitmap_height; y++) {
 			int src_index = ((bitmap_height - 1) * spacebar_width) - y * spacebar_width;
 			int dest_index = y * bitmap_width;
 			memset(&bitmap_memory[dest_index], 0x00, spacebar_width);
@@ -79,8 +78,7 @@ void load_font(FontData* font_data, int font_height_px, const char* font_path)
 	int bitmap_x_offset = spacebar_width;
 	int char_data_index = 1;
 
-	for (int c = starting_char; c < last_char; c++)
-	{
+	for (int c = starting_char; c < last_char; c++) {
 		int character = c;
 
 		FT_Error load_char_err = FT_Load_Char(ft_face, character, FT_LOAD_RENDER);
@@ -125,7 +123,7 @@ void load_font(FontData* font_data, int font_height_px, const char* font_path)
 		new_char_data.UV_y1 = normalize_value(glyph_height, atlas_height, 1.0f);
 
 		font_data->char_data[char_data_index++] = new_char_data;
-		bitmap_x_offset += glyph_width;
+		bitmap_x_offset += glyph_width + padding;
 	}
 
 	create_font_atlas_texture(font_data, bitmap_width, bitmap_height, bitmap_memory);

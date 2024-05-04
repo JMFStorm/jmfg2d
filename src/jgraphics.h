@@ -44,4 +44,5 @@ void draw_dots(f32 size_px);
 void append_line(vec3 start, vec3 end, vec3 color);
 void draw_lines(f32 width_px);
 
-void draw_rect(Point start, Point end);
+void draw_rect(Point start, Point end, float width, vec3 color);
+

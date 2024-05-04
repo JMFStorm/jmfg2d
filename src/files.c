@@ -4,28 +4,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void str_null_terminate(char* str, s64 length)
-{
-    char* loc = &str[length];
-    *loc = 0;
+void str_null_terminate(char* str, s64 length) {
+        char* loc = &str[length];
+        *loc = 0;
 }
 
-void read_file_to_ptr(char* filepath, char* buffer, s64 max_bytes)
-{
+void read_file_to_ptr(char* filepath, char* buffer, s64 max_bytes) {
 	FILE *file;
-    s64 file_size;
+        s64 file_size;
 
-    file = fopen(filepath, "rb");
-    assert(file);
+        file = fopen(filepath, "rb");
+        assert(file);
 
-    fseek(file, 0, SEEK_END);
-    file_size = ftell(file);
-    assert(file_size < max_bytes);
+        fseek(file, 0, SEEK_END);
+        file_size = ftell(file);
+        assert(file_size < max_bytes);
 
-    fseek(file, 0, SEEK_SET);
+        fseek(file, 0, SEEK_SET);
 
-    fread(buffer, 1, file_size, file);
-    str_null_terminate(buffer, file_size);
+        fread(buffer, 1, file_size, file);
+        str_null_terminate(buffer, file_size);
 
-    fclose(file);
+        fclose(file);
 }

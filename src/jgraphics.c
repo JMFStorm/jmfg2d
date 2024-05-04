@@ -63,8 +63,8 @@ u32 compile_shader(char* vertex_shader_path, char* fragment_shader_path)
 
 void init_rectangle_shader()
 {
-    const char* vertex_shader_path   = "G:/projects/game/jmfg2d/resources/shaders/rectangle_vs.glsl";
-    const char* fragment_shader_path = "G:/projects/game/jmfg2d/resources/shaders/rectangle_fs.glsl";
+    const char* vertex_shader_path   = "G:/projects/game/jmfg2d.win32/resources/shaders/rectangle_vs.glsl";
+    const char* fragment_shader_path = "G:/projects/game/jmfg2d.win32/resources/shaders/rectangle_fs.glsl";
 
     rect_shader.base_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
 
@@ -112,8 +112,8 @@ void init_rectangle_shader()
 
 void init_text_shader()
 {
-    const char* vertex_shader_path   = "G:/projects/game/jmfg2d/resources/shaders/ui_text_vs.glsl";
-    const char* fragment_shader_path = "G:/projects/game/jmfg2d/resources/shaders/ui_text_fs.glsl";
+    const char* vertex_shader_path   = "G:/projects/game/jmfg2d.win32/resources/shaders/ui_text_vs.glsl";
+    const char* fragment_shader_path = "G:/projects/game/jmfg2d.win32/resources/shaders/ui_text_fs.glsl";
 
     ui_text_shader.base_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
 
@@ -140,8 +140,8 @@ void init_text_shader()
 
 void init_dot_shader()
 {
-    const char* vertex_shader_path   = "G:/projects/game/jmfg2d/resources/shaders/dot_vs.glsl";
-    const char* fragment_shader_path = "G:/projects/game/jmfg2d/resources/shaders/dot_fs.glsl";
+    const char* vertex_shader_path   = "G:/projects/game/jmfg2d.win32/resources/shaders/dot_vs.glsl";
+    const char* fragment_shader_path = "G:/projects/game/jmfg2d.win32/resources/shaders/dot_fs.glsl";
 
     dot_shader.base_shader.id = compile_shader((char*)vertex_shader_path, (char*)fragment_shader_path);
 
@@ -166,20 +166,17 @@ void init_dot_shader()
     glBindVertexArray(0);
 }
 
-void init_shaders()
-{
+void init_shaders() {
 	init_rectangle_shader();
-    init_text_shader();
-    init_dot_shader();
+        init_text_shader();
+        init_dot_shader();
 }
 
-void set_draw_area(s32 start_x, s32 start_y, s32 end_x, s32 end_y)
-{
-    glViewport(start_x, start_y, end_x, end_y);
+void set_draw_area(s32 start_x, s32 start_y, s32 end_x, s32 end_y) {
+        glViewport(start_x, start_y, end_x, end_y);
 }
 
-u32 load_image_to_texture(char* image_path)
-{
+u32 load_image_to_texture(char* image_path) {
     u32 texture_id = 0;
     ImageData image = load_image_data(image_path);
     assert(image.channels == 3 || image.channels == 4);
@@ -317,7 +314,7 @@ void draw_dots(f32 size_px)
     glBindVertexArray(0);
 }
 
-void draw_rect(Point start, Point end)
+void draw_rect(Point start, Point end, float width, vec3 color)
 {
     vec3 top_left = {
         normalize_screen_px_to_ndc(start.x, user_settings.window_width_px),
@@ -339,12 +336,12 @@ void draw_rect(Point start, Point end)
         bot_right.y,
         0
     };
-    vec3 color = { 1, 1, 1 };
+    
     append_line(top_left, top_right, color);
     append_line(top_left, bot_left, color);
     append_line(bot_right, top_right, color);
     append_line(bot_right, bot_left, color);
-    draw_lines(1.0f);
+    draw_lines(width);
 }
 
 Point append_ui_text_debug(FontData* font_data, char* text, Point start_px)
@@ -359,7 +356,8 @@ Point append_ui_text_debug(FontData* font_data, char* text, Point start_px)
     end.x = next_cursor.x;
     end.y = user_settings.window_height_px - next_cursor.y;
 
-    draw_rect(start, end);
+    vec3 color = { 1.0f, 1.0f, 1.0f };
+    draw_rect(start, end, 1.0f, color);
     return next_cursor;
 }
 
@@ -384,8 +382,7 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
     {
         char current_char = *text_string++;
 
-        if (current_char == '\n')
-        {
+        if (current_char == '\n') {
             text_offset_x_px = 0;
             text_offset_y_px -= font_data->font_height_px;
             next_cursor.x = start_px.x;
