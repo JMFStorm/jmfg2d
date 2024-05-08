@@ -37,6 +37,7 @@ void create_font_atlas_texture(FontData* font_data, s32 bitmap_width, s32 bitmap
 Point append_ui_text(FontData* font_data, char* text, Point start_px);
 Point append_ui_text_debug(FontData* font_data, char* text, Point start_px);
 void draw_ui_text(FontData* font_data_ptr, vec3 color);
+void draw_ui_text_transform(FontData* font_data_ptr, vec3 color, mat4x4 tranform);
 
 void append_dot(vec3 position, vec3 color);
 void draw_dots(f32 size_px);

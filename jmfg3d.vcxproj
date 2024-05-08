@@ -263,6 +263,12 @@
     <None Include="build_release.bat" />
     <None Include="debug.rdbg" />
     <None Include="git_commit.bat" />
+    <None Include="resources\shaders\dot_fs.glsl" />
+    <None Include="resources\shaders\dot_vs.glsl" />
+    <None Include="resources\shaders\rectangle_fs.glsl" />
+    <None Include="resources\shaders\rectangle_vs.glsl" />
+    <None Include="resources\shaders\ui_text_fs.glsl" />
+    <None Include="resources\shaders\ui_text_vs.glsl" />
     <None Include="vc140.pdb" />
   </ItemGroup>
   <ItemGroup>

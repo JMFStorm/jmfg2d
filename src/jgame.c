@@ -21,7 +21,7 @@ void print_debug_info() {
         sprintf_s(str, 100, "Time elapsed: %.2fms", time);
         append_ui_text(debug_font_ptr, str, cursor);
 
-        cursor.y = vh_to_screen_px(7.0f);
+        cursor.y += debug_font_ptr->font_height_px + (debug_font_ptr->font_height_px * 0.15f);
 
         char str2[100] = { 0 };
         sprintf_s(str2, 100, "Frames: %llu", system_data.frames_drawn);

@@ -18,6 +18,7 @@ WNDCLASSEX window_class;
 HWND window_handle;
 HGLRC opengl_context;
 GameInputs inputs;
+bool game_loop_running = true;
 
 void debug_log(const char* str_format, ...) {
 #ifdef _DEBUG
@@ -80,6 +81,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param
         switch (msg) {
                 case WM_DESTROY: {
                         PostQuitMessage(0);
+                        game_loop_running = false;
                         return 0;
                 }
                 
@@ -248,7 +250,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         MSG msg;
         HDC device_context = GetDC(window_handle);
     
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+        while (game_loop_running && PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
           

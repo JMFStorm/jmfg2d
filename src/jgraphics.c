@@ -437,23 +437,33 @@ Point append_ui_text(FontData* font_data, char* text, Point start_px)
 
 void draw_ui_text(FontData* font_data_ptr, vec3 color)
 {
-    glUseProgram(ui_text_shader.base_shader.id);
-    glBindVertexArray(ui_text_shader.base_shader.vao);
+        mat4x4 transform;
+        mat4x4_identity(transform);
+        draw_ui_text_transform(font_data_ptr, color, transform);
+}
 
-    int color_uniform = glGetUniformLocation(ui_text_shader.base_shader.id, "textColor");
-    glUniform3f(color_uniform, color.x, color.y, color.z);
+void draw_ui_text_transform(FontData* font_data_ptr, vec3 color, mat4x4 tranform)
+{
+        glUseProgram(ui_text_shader.base_shader.id);
+        glBindVertexArray(ui_text_shader.base_shader.vao);
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBindTexture(GL_TEXTURE_2D, font_data_ptr->texture_id);
+        int color_uniform = glGetUniformLocation(ui_text_shader.base_shader.id, "textColor");
+        glUniform3f(color_uniform, color.x, color.y, color.z);
 
-    s64 indicies = ui_chars_buffered * 6;
-    glDrawArrays(GL_TRIANGLES, 0, indicies);
+        unsigned int transform_uniform = glGetUniformLocation(ui_text_shader.base_shader.id, "transform");
+        glUniformMatrix4fv(transform_uniform, 1, GL_TRUE, &tranform[0]);
 
-    ui_chars_buffered = 0;
-    frame_data.draw_calls++;
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBindTexture(GL_TEXTURE_2D, font_data_ptr->texture_id);
 
-    glUseProgram(0);
-    glBindVertexArray(0);
+        s64 indicies = ui_chars_buffered * 6;
+        glDrawArrays(GL_TRIANGLES, 0, indicies);
+
+        ui_chars_buffered = 0;
+        frame_data.draw_calls++;
+
+        glUseProgram(0);
+        glBindVertexArray(0);
 }
 
 void create_font_atlas_texture(FontData* font_data_ptr, s32 bitmap_width, s32 bitmap_height, byte* bitmap_memory)
